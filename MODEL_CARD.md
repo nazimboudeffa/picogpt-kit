@@ -7,6 +7,9 @@ tags:
   - llama.app
   - alpaca
   - instruction
+  - daisy
+  - rag
+  - abstention
 ---
 
 # PicoGPT1-Daisy
@@ -19,6 +22,22 @@ Petit modèle GPT-2 entraîné sur un sous-ensemble de 500 instructions/réponse
 - Fichiers : poids Transformers (`model.safetensors`) et variante `PicoGPT1-Daisy.gguf`
 
 > Modèle expérimental de très petite taille : les réponses peuvent être incohérentes.
+
+## Différences avec `PicoGPT1-Jasmine`
+
+L'ancien dépôt [`nazimboudeffa/PicoGPT1-Jasmine`](https://huggingface.co/nazimboudeffa/PicoGPT1-Jasmine) est conservé tel quel comme référence historique. Celui-ci est une **nouvelle version**, sans changement d'architecture.
+
+| Élément | `PicoGPT1-Jasmine` (ancien) | `PicoGPT1-Daisy` (ce dépôt) |
+| --- | --- | --- |
+| Architecture | GPT-2 : 2 couches, 128 dims, 2 têtes, contexte 256 | **Identique** (6,86 M paramètres) |
+| Jeu d'entraînement | 500 exemples Alpaca bruts | 500 exemples Alpaca **filtrés** + 245 exemples d'ancrage = **745 exemples** |
+| Données | Quelques erreurs factuelles et doublons | Erreurs connues retirées (eau à 115 °C, fausse définition du « mole », `<nooutput>`), doublons supprimés, format uniformisé |
+| Décodage | Glouton par défaut, boucles fréquentes | Échantillonnage par défaut (`top_k=40`, `no_repeat_ngram_size=3`, `repetition_penalty=1.15`), arrêt à l'EOS ou au premier `\n`, séparateur `\n` garanti |
+| Ancrage / abstention | Aucun | `knowledge.jsonl` (30 faits), TF-IDF, copie contrainte du contexte, `Je ne sais pas.` hors base |
+| Entraînement | 10 epochs, ~1 250 steps, loss finale ≈ 4,95 | 10 epochs, ~1 860 steps, loss finale ≈ 4,54 |
+| GGUF | Ancien export | Régénéré depuis les nouveaux poids |
+
+En résumé : **même architecture, mais données nettoyées, décodage corrigé et ancrage anti-hallucination**. Le passage d'une génération libre à une réponse extraite d'un contexte vérifié est le changement le plus important. Le code source et la documentation détaillée sont dans <https://github.com/nazimboudeffa/picogpt1-daisy>.
 
 ## Utiliser avec llama.app / llama.cpp
 
