@@ -19,6 +19,7 @@ from model_utils import (
     generate,
     load_model,
 )
+from rag import DEFAULT_MIN_SCORE, answer_with_rag
 
 
 def main():
@@ -53,23 +54,37 @@ def main():
     parser.add_argument(
         "--no-repeat-ngram-size", type=int, default=DEFAULT_NO_REPEAT_NGRAM_SIZE
     )
+    parser.add_argument(
+        "--rag", action="store_true", help="ancre la réponse dans knowledge.jsonl"
+    )
+    parser.add_argument("--rag-k", type=int, default=1, help="nombre de passages à considérer")
+    parser.add_argument("--min-score", type=float, default=DEFAULT_MIN_SCORE)
     args = parser.parse_args()
 
+    gen_kwargs = {
+        "max_new_tokens": args.max_new_tokens,
+        "do_sample": args.do_sample,
+        "temperature": args.temperature,
+        "top_p": args.top_p,
+        "top_k": args.top_k,
+        "repetition_penalty": args.repetition_penalty,
+        "no_repeat_ngram_size": args.no_repeat_ngram_size,
+    }
+
     tokenizer, model = load_model(args.model_dir)
-    print(
-        generate(
-            tokenizer,
-            model,
-            args.prompt,
-            max_new_tokens=args.max_new_tokens,
-            do_sample=args.do_sample,
-            temperature=args.temperature,
-            top_p=args.top_p,
-            top_k=args.top_k,
-            repetition_penalty=args.repetition_penalty,
-            no_repeat_ngram_size=args.no_repeat_ngram_size,
+    if args.rag:
+        print(
+            answer_with_rag(
+                tokenizer,
+                model,
+                args.prompt,
+                k=args.rag_k,
+                min_score=args.min_score,
+                **gen_kwargs,
+            )
         )
-    )
+    else:
+        print(generate(tokenizer, model, args.prompt, **gen_kwargs))
 
 
 if __name__ == "__main__":

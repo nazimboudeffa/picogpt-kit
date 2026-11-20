@@ -32,12 +32,17 @@ Corps JSON :
 | `top_k` | int | `40` | Limite de tokens candidats |
 | `repetition_penalty` | float | `1.15` | Pénalité de répétition |
 | `no_repeat_ngram_size` | int | `3` | Anti-répétition de trigrammes |
+| `use_rag` | bool | `false` | Active l'ancrage dans `knowledge.jsonl` |
+| `rag_k` | int | `1` | Nombre de passages récupérés à considérer |
+| `min_score` | float | `0.50` | Score TF-IDF minimal pour fournir un contexte |
 
 Réponse succès (`200`) :
 
 ```json
 { "generated_text": "prompt + réponse" }
 ```
+
+Avec `use_rag: true`, `generated_text` ne contient que la réponse courte (extrait ancré ou `Je ne sais pas.`), et non le prompt complet. Le seuil et le nombre de passages sont détaillés dans [12-rag.md](12-rag.md).
 
 Erreur (`400`) :
 
@@ -67,6 +72,27 @@ curl -X POST http://127.0.0.1:8000/generate \
   -H "Content-Type: application/json" \
   -d '{"prompt":"What is psychoanalysis?\n","do_sample":true}'
 ```
+
+Corps JSON avec ancrage RAG :
+
+```json
+{
+  "prompt": "Quelle est la capitale de la France ?",
+  "use_rag": true,
+  "rag_k": 1,
+  "min_score": 0.5
+}
+```
+
+Appel curl correspondant :
+
+```bash
+curl -X POST http://127.0.0.1:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Quelle est la capitale de la France ?","use_rag":true,"rag_k":1,"min_score":0.5}'
+```
+
+`scikit-learn` doit être installé pour utiliser `use_rag`.
 
 ## Options CLI
 

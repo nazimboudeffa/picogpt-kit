@@ -68,13 +68,25 @@ def generate(
     top_k=DEFAULT_TOP_K,
     repetition_penalty=DEFAULT_REPETITION_PENALTY,
     no_repeat_ngram_size=DEFAULT_NO_REPEAT_NGRAM_SIZE,
+    return_full_text=True,
+    prefix_allowed_tokens_fn=None,
+    num_beams=1,
 ):
-    """Génère une réponse et renvoie le texte complet (prompt + réponse).
+    """Génère une réponse.
+
+    Par défaut, renvoie le texte complet (prompt + réponse). Avec
+    ``return_full_text=False``, renvoie uniquement la réponse générée.
 
     L'échantillonnage est activé par défaut : le décodage glouton provoque des
     boucles sur ce petit modèle. La génération s'arrête à l'EOS ou au premier
     saut de ligne produit après la réponse.
     """
+    # À l'entraînement, le `\n` entre prompt et réponse était toujours fourni
+    # (et masqué dans les labels) : le modèle n'a donc pas appris à le générer.
+    # On le garantit ici, sinon la réponse démarre au milieu de la ligne.
+    if not prompt.endswith("\n"):
+        prompt = prompt + "\n"
+
     inputs = tokenizer(
         prompt,
         return_tensors="pt",
@@ -88,6 +100,7 @@ def generate(
         "pad_token_id": tokenizer.eos_token_id,
         "eos_token_id": tokenizer.eos_token_id,
         "do_sample": do_sample,
+        "num_beams": num_beams,
         "no_repeat_ngram_size": no_repeat_ngram_size,
         "stopping_criteria": StoppingCriteriaList(
             [StopAtNewline(tokenizer, prompt_len)]
@@ -101,5 +114,12 @@ def generate(
             repetition_penalty=repetition_penalty,
         )
 
+    if prefix_allowed_tokens_fn is not None:
+        gen_kwargs["prefix_allowed_tokens_fn"] = prefix_allowed_tokens_fn
+
     output_ids = model.generate(**inputs, **gen_kwargs)
-    return tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    if return_full_text:
+        return tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    return tokenizer.decode(
+        output_ids[0, prompt_len:], skip_special_tokens=True
+    ).lstrip()

@@ -34,11 +34,13 @@ checkpoint-*/
 *.h5
 *.tflite
 
-# Données
+# Données générées (knowledge.jsonl est versionné)
 train.txt
+rag_train.txt
 *.csv
 *.tsv
 *.jsonl
+!knowledge.jsonl
 
 # Systèmes
 .DS_Store

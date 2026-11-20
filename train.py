@@ -19,11 +19,11 @@ from transformers import (
     TrainingArguments,
 )
 
-DATA_PATH = Path("train.txt")
+DATA_PATHS = [Path("train.txt"), Path("rag_train.txt")]
 OUTPUT_DIR = Path("PicoGPT1-Daisy")
 
 MAX_LEN = 256          # taille du contexte
-MAX_EXAMPLES = 500     # nombre d'exemples lus depuis train.txt
+MAX_EXAMPLES = 2000    # nombre maximum d'exemples, tous fichiers confondus
 EPOCHS = 10
 BATCH_SIZE = 4
 LEARNING_RATE = 5e-4
@@ -45,25 +45,35 @@ def build_example(tokenizer, prompt, completion):
     }
 
 
-def load_dataset_from_file(tokenizer):
-    """Lit train.txt : deux lignes par exemple (prompt, réponse), séparées par une ligne vide."""
-    content = DATA_PATH.read_text(encoding="utf-8")
+def load_datasets(tokenizer):
+    """Lit les fichiers de données : deux lignes par exemple, une ligne vide entre eux."""
     examples = []
 
-    for block in content.split("\n\n"):
-        lines = [line.strip() for line in block.splitlines() if line.strip()]
-        if len(lines) < 2:
+    for path in DATA_PATHS:
+        if not path.is_file():
+            print(f"{path} introuvable, ignoré.")
             continue
+        content = path.read_text(encoding="utf-8")
 
-        examples.append(build_example(tokenizer, lines[0], lines[1]))
-        if len(examples) >= MAX_EXAMPLES:
-            break
+        for block in content.split("\n\n"):
+            lines = [line.strip() for line in block.splitlines() if line.strip()]
+            if len(lines) < 2:
+                continue
+
+            examples.append(build_example(tokenizer, lines[0], lines[1]))
+            if len(examples) >= MAX_EXAMPLES:
+                return Dataset.from_list(examples)
 
     return Dataset.from_list(examples)
 
 
 def main():
-    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+    # Le tokenizer est déjà sauvegardé avec le modèle : lire ce dossier évite
+    # une requête réseau (et ses erreurs TLS) et garantit le même vocabulaire.
+    tokenizer_source = (
+        OUTPUT_DIR if (OUTPUT_DIR / "tokenizer.json").is_file() else "gpt2"
+    )
+    tokenizer = GPT2TokenizerFast.from_pretrained(str(tokenizer_source))
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.model_max_length = MAX_LEN
     # Format appris pendant l'entraînement : "prompt\nreponse<|endoftext|>"
@@ -77,8 +87,9 @@ def main():
     print(f"Vocab size : {len(tokenizer)}")
     print(f"PAD token  : {tokenizer.pad_token!r}")
 
-    dataset = load_dataset_from_file(tokenizer)
-    print(f"{len(dataset)} exemples chargés depuis {DATA_PATH}")
+    dataset = load_datasets(tokenizer)
+    sources = ", ".join(str(path) for path in DATA_PATHS)
+    print(f"{len(dataset)} exemples chargés depuis {sources}")
 
     config = GPT2Config(
         vocab_size=len(tokenizer),

@@ -1,6 +1,6 @@
 # Documentation — PicoGPT1-Daisy
 
-Cette documentation décrit le dépôt local, l'entraînement, la génération, le serveur HTTP, l'export GGUF et la publication sur Hugging Face.
+Cette documentation décrit le dépôt local, l'entraînement, la génération, le serveur HTTP, l'export GGUF, la publication sur Hugging Face et le pipeline d'ancrage (RAG).
 
 ## Sommaire
 
@@ -15,14 +15,17 @@ Cette documentation décrit le dépôt local, l'entraînement, la génération, 
 9. [Architecture du modèle](09-architecture.md)
 10. [Dépannage](10-depannage.md)
 11. [Limites et pistes d'amélioration](11-limites.md)
+12. [Ancrage / RAG](12-rag.md)
 
 ## Démarrage rapide
 
 ```bash
-python -m pip install torch transformers datasets huggingface_hub
+python -m pip install torch transformers datasets huggingface_hub scikit-learn
 python prepare_dataset.py
+python prepare_rag_dataset.py
 python train.py
-python test.py --prompt "What is 2+2?\n" --do-sample
+python test.py --prompt "Quelle est la capitale de la France ?" --rag
+python evaluate.py
 ```
 
 Serveur local :

@@ -1,0 +1,30 @@
+{"id":"capital_fr","text":"La capitale de la France est Paris.","question":"Quelle est la capitale de la France ?","answer":"Paris"}
+{"id":"boiling_water","text":"À pression atmosphérique normale, l'eau bout à 100 °C.","question":"À quelle température l'eau bout-elle au niveau de la mer ?","answer":"100 °C"}
+{"id":"water_formula","text":"La formule chimique de l'eau est H2O.","question":"Quelle est la formule chimique de l'eau ?","answer":"H2O"}
+{"id":"photosynthesis","text":"La photosynthèse permet aux plantes de convertir la lumière en énergie chimique.","question":"Que permet la photosynthèse chez les plantes ?","answer":"convertir la lumière en énergie chimique"}
+{"id":"moon","text":"La Lune est le satellite naturel de la Terre.","question":"Quel est le satellite naturel de la Terre ?","answer":"La Lune"}
+{"id":"mercury","text":"La planète la plus proche du Soleil est Mercure.","question":"Quelle planète est la plus proche du Soleil ?","answer":"Mercure"}
+{"id":"jupiter","text":"Jupiter est la plus grande planète du système solaire.","question":"Quelle est la plus grande planète du système solaire ?","answer":"Jupiter"}
+{"id":"heart","text":"Le cœur humain possède quatre cavités.","question":"Combien de cavités possède le cœur humain ?","answer":"quatre cavités"}
+{"id":"brain","text":"Le cerveau est l'organe principal du système nerveux.","question":"Quel est l'organe principal du système nerveux ?","answer":"Le cerveau"}
+{"id":"gravity","text":"La gravité terrestre accélère les objets à environ 9,8 m/s².","question":"Quelle est l'accélération de la gravité terrestre ?","answer":"9,8 m/s²"}
+{"id":"light_speed","text":"La vitesse de la lumière dans le vide est d'environ 300 000 km/s.","question":"Quelle est la vitesse de la lumière dans le vide ?","answer":"300 000 km/s"}
+{"id":"french_revolution","text":"La Révolution française a commencé en 1789.","question":"En quelle année a commencé la Révolution française ?","answer":"1789"}
+{"id":"ww2_end","text":"La Seconde Guerre mondiale s'est terminée en 1945.","question":"En quelle année s'est terminée la Seconde Guerre mondiale ?","answer":"1945"}
+{"id":"printing","text":"L'imprimerie a été inventée par Johannes Gutenberg au XVe siècle.","question":"Qui a inventé l'imprimerie ?","answer":"Johannes Gutenberg"}
+{"id":"web","text":"Le World Wide Web a été créé par Tim Berners-Lee en 1989.","question":"Qui a créé le World Wide Web ?","answer":"Tim Berners-Lee"}
+{"id":"python","text":"Le langage Python a été créé par Guido van Rossum.","question":"Qui a créé le langage Python ?","answer":"Guido van Rossum"}
+{"id":"html","text":"HTML signifie HyperText Markup Language.","question":"Que signifie l'abréviation HTML ?","answer":"HyperText Markup Language"}
+{"id":"capital_be","text":"La capitale de la Belgique est Bruxelles.","question":"Quelle est la capitale de la Belgique ?","answer":"Bruxelles"}
+{"id":"capital_it","text":"La capitale de l'Italie est Rome.","question":"Quelle est la capitale de l'Italie ?","answer":"Rome"}
+{"id":"capital_jp","text":"La capitale du Japon est Tokyo.","question":"Quelle est la capitale du Japon ?","answer":"Tokyo"}
+{"id":"pacific","text":"Le plus grand océan de la Terre est l'océan Pacifique.","question":"Quel est le plus grand océan de la Terre ?","answer":"océan Pacifique"}
+{"id":"everest","text":"Le mont Everest est la plus haute montagne du monde.","question":"Quelle est la plus haute montagne du monde ?","answer":"Le mont Everest"}
+{"id":"colors","text":"Les couleurs primaires en peinture sont le rouge, le bleu et le jaune.","question":"Quelles sont les couleurs primaires en peinture ?","answer":"rouge, le bleu et le jaune"}
+{"id":"honey","text":"Les abeilles produisent du miel à partir du nectar des fleurs.","question":"À partir de quoi les abeilles produisent-elles du miel ?","answer":"nectar des fleurs"}
+{"id":"sleep","text":"Un adulte dort en moyenne sept à huit heures par nuit.","question":"Combien d'heures un adulte dort-il en moyenne par nuit ?","answer":"sept à huit heures"}
+{"id":"vaccine","text":"Un vaccin stimule le système immunitaire.","question":"Qu'est-ce qu'un vaccin stimule ?","answer":"système immunitaire"}
+{"id":"cpu","text":"Un ordinateur traite l'information à l'aide d'un processeur.","question":"À l'aide de quoi un ordinateur traite-t-il l'information ?","answer":"processeur"}
+{"id":"flag_fr","text":"Le drapeau français est bleu, blanc et rouge.","question":"Quelles sont les couleurs du drapeau français ?","answer":"bleu, blanc et rouge"}
+{"id":"euro","text":"La France utilise l'euro comme monnaie.","question":"Quelle monnaie la France utilise-t-elle ?","answer":"l'euro"}
+{"id":"sun","text":"Le Soleil est une étoile.","question":"Qu'est-ce que le Soleil ?","answer":"étoile"}

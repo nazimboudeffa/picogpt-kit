@@ -14,9 +14,13 @@
   "clean_up_tokenization_spaces": false,
   "eos_token": "<|endoftext|>",
   "extra_special_tokens": {},
+  "max_length": 256,
   "model_max_length": 256,
   "pad_token": "<|endoftext|>",
+  "stride": 0,
   "tokenizer_class": "GPT2Tokenizer",
+  "truncation_side": "right",
+  "truncation_strategy": "longest_first",
   "unk_token": "<|endoftext|>",
   "chat_template": "{% for message in messages %}{{ message['content'] }}{% if not loop.last %}{{ '\\n' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '\\n' }}{% endif %}"
 }

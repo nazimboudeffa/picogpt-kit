@@ -20,6 +20,7 @@ from model_utils import (
     generate,
     load_model,
 )
+from rag import DEFAULT_MIN_SCORE, answer_with_rag
 
 
 def make_handler(tokenizer, model):
@@ -37,23 +38,32 @@ def make_handler(tokenizer, model):
                 prompt = data["prompt"]
                 if not isinstance(prompt, str) or not prompt.strip():
                     raise ValueError("Le champ 'prompt' doit être une chaîne non vide.")
-                max_new_tokens = int(data.get("max_new_tokens", DEFAULT_MAX_NEW_TOKENS))
-                text = generate(
-                    tokenizer,
-                    model,
-                    prompt,
-                    max_new_tokens=max_new_tokens,
-                    do_sample=bool(data.get("do_sample", True)),
-                    temperature=float(data.get("temperature", DEFAULT_TEMPERATURE)),
-                    top_p=float(data.get("top_p", DEFAULT_TOP_P)),
-                    top_k=int(data.get("top_k", DEFAULT_TOP_K)),
-                    repetition_penalty=float(
+                gen_kwargs = {
+                    "max_new_tokens": int(
+                        data.get("max_new_tokens", DEFAULT_MAX_NEW_TOKENS)
+                    ),
+                    "do_sample": bool(data.get("do_sample", True)),
+                    "temperature": float(data.get("temperature", DEFAULT_TEMPERATURE)),
+                    "top_p": float(data.get("top_p", DEFAULT_TOP_P)),
+                    "top_k": int(data.get("top_k", DEFAULT_TOP_K)),
+                    "repetition_penalty": float(
                         data.get("repetition_penalty", DEFAULT_REPETITION_PENALTY)
                     ),
-                    no_repeat_ngram_size=int(
+                    "no_repeat_ngram_size": int(
                         data.get("no_repeat_ngram_size", DEFAULT_NO_REPEAT_NGRAM_SIZE)
                     ),
-                )
+                }
+                if bool(data.get("use_rag", False)):
+                    text = answer_with_rag(
+                        tokenizer,
+                        model,
+                        prompt,
+                        k=int(data.get("rag_k", 1)),
+                        min_score=float(data.get("min_score", DEFAULT_MIN_SCORE)),
+                        **gen_kwargs,
+                    )
+                else:
+                    text = generate(tokenizer, model, prompt, **gen_kwargs)
             except Exception as exc:
                 self._send_json(400, {"error": str(exc)})
                 return
