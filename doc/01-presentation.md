@@ -10,7 +10,7 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 
 | Élément | État |
 | --- | --- |
-| Entraînement | Terminé (10 epochs, 1 250 steps, loss finale ≈ 4,95) |
+| Entraînement | Terminé (745 exemples, 10 epochs, ~1 860 steps, loss finale ≈ 4,54) |
 | Poids locaux | `PicoGPT1-Daisy/model.safetensors` (non versionné) |
 | Publication | https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
@@ -39,8 +39,6 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 ├── serve.py                 # serveur HTTP local
 ├── test.py                  # génération en ligne de commande
 ├── train.py                 # entraînement
-├── train.ipynb              # référence historique
-├── test.ipynb               # référence historique
 └── README.md                # vue d'ensemble
 ```
 
@@ -53,4 +51,3 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 - `huggingface_hub` 0.33.0
 - CLI llama.cpp / llama.app build b12375
 
-Les notebooks `train.ipynb` et `test.ipynb` sont conservés comme référence historique, mais les scripts Python en sont l'équivalent direct.

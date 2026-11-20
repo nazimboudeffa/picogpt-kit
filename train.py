@@ -3,8 +3,8 @@
 Usage :
     python train.py
 
-Équivalent de train.ipynb, sans Jupyter. Modifie les constantes ci-dessous
-pour changer la taille ou le nombre d'exemples.
+Modifie les constantes ci-dessous pour changer la taille ou le nombre
+d'exemples.
 """
 
 from pathlib import Path

@@ -61,8 +61,6 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Versions utilisées | Python 3.13 / Windows 11, `transformers` 4.52.4, `huggingface_hub` 0.33.0, `torch` CPU |
 
-Les notebooks `train.ipynb` et `test.ipynb` sont conservés comme référence historique ; les scripts Python en sont l'équivalent direct et sont la voie recommandée.
-
 Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 
 ---
@@ -93,8 +91,6 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 ├── serve.py                   # serveur HTTP local
 ├── test.py                    # génération en ligne de commande
 ├── train.py                   # entraînement
-├── train.ipynb                # référence historique
-├── test.ipynb                 # référence historique
 ├── train.txt                  # dataset généré, ignoré par Git
 ├── rag_train.txt              # dataset ancré généré, ignoré par Git
 ├── PicoGPT1-Daisy.gguf      # export GGUF, ignoré par Git
