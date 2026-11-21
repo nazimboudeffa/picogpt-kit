@@ -39,6 +39,7 @@ facts_train.txt
 *.tsv
 *.jsonl
 !knowledge.jsonl
+!eval/test.jsonl
 
 # Systèmes
 .DS_Store

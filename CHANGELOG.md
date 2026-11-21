@@ -4,6 +4,13 @@ Toutes les évolutions notables du projet sont consignées ici. Le codename (nom
 
 Format d'une release : `PicoGPT<majeure>-<Fleur>`, avec un tag git `v<version>-<fleur en minuscules>`.
 
+## [Non publié]
+
+- Ajout : jeu de test figé `eval/test.jsonl` (40 questions jamais vues) et contrôle de fuite `eval/check_leakage.py`.
+- Ajout : `evaluate.py --split test` écrit un rapport par codename dans `reports/`, avec empreinte du jeu, commit et détails des réponses.
+- Ajout : `compare_reports.py` et [doc/14-benchmark.md](doc/14-benchmark.md).
+- Mesure de référence sur Daisy : 28/30 réponses exactes sur le jeu test (contre 30/30 sur le jeu train), 30/30 retrieval, 5/5 abstentions hors base éloignées, 1/5 hors base proches. Voir `reports/daisy-test.json`.
+
 ## [1.0.0] — Daisy — 2026-11-21
 
 Première version documentée du kit.

@@ -1,0 +1,40 @@
+{"id":"t01","fact_id":"capital_fr","question":"Comment s'appelle la capitale de la France ?","expected":"Paris","scope":"in"}
+{"id":"t02","fact_id":"boiling_water","question":"L'eau bout à quelle température quand on est au niveau de la mer ?","expected":"100 °C","scope":"in"}
+{"id":"t03","fact_id":"water_formula","question":"Quelle est la notation chimique de l'eau ?","expected":"H2O","scope":"in"}
+{"id":"t04","fact_id":"photosynthesis","question":"À quoi sert la photosynthèse chez les plantes ?","expected":"convertir la lumière en énergie chimique","scope":"in"}
+{"id":"t05","fact_id":"moon","question":"Quel astre est le satellite naturel de la Terre ?","expected":"La Lune","scope":"in"}
+{"id":"t06","fact_id":"mercury","question":"Quelle planète se situe le plus près du Soleil ?","expected":"Mercure","scope":"in"}
+{"id":"t07","fact_id":"jupiter","question":"Quelle planète du système solaire a la plus grande taille ?","expected":"Jupiter","scope":"in"}
+{"id":"t08","fact_id":"heart","question":"Le cœur humain compte combien de cavités ?","expected":"quatre cavités","scope":"in"}
+{"id":"t09","fact_id":"brain","question":"Quel organe dirige le système nerveux ?","expected":"Le cerveau","scope":"in"}
+{"id":"t10","fact_id":"gravity","question":"À combien est estimée l'accélération due à la gravité sur Terre ?","expected":"9,8 m/s²","scope":"in"}
+{"id":"t11","fact_id":"light_speed","question":"À quelle vitesse la lumière se propage-t-elle dans le vide ?","expected":"300 000 km/s","scope":"in"}
+{"id":"t12","fact_id":"french_revolution","question":"En quelle année la Révolution française a-t-elle débuté ?","expected":"1789","scope":"in"}
+{"id":"t13","fact_id":"ww2_end","question":"Quelle année marque la fin de la Seconde Guerre mondiale ?","expected":"1945","scope":"in"}
+{"id":"t14","fact_id":"printing","question":"À qui doit-on l'invention de l'imprimerie ?","expected":"Johannes Gutenberg","scope":"in"}
+{"id":"t15","fact_id":"web","question":"Qui est à l'origine de la création du World Wide Web ?","expected":"Tim Berners-Lee","scope":"in"}
+{"id":"t16","fact_id":"python","question":"Quel programmeur a créé le langage Python ?","expected":"Guido van Rossum","scope":"in"}
+{"id":"t17","fact_id":"html","question":"Que veut dire le sigle HTML ?","expected":"HyperText Markup Language","scope":"in"}
+{"id":"t18","fact_id":"capital_be","question":"Quelle ville sert de capitale à la Belgique ?","expected":"Bruxelles","scope":"in"}
+{"id":"t19","fact_id":"capital_it","question":"L'Italie a pour capitale quelle ville ?","expected":"Rome","scope":"in"}
+{"id":"t20","fact_id":"capital_jp","question":"Comment s'appelle la capitale japonaise ?","expected":"Tokyo","scope":"in"}
+{"id":"t21","fact_id":"pacific","question":"Quel océan est le plus étendu sur Terre ?","expected":"océan Pacifique","scope":"in"}
+{"id":"t22","fact_id":"everest","question":"Quel sommet est le plus haut du monde ?","expected":"Le mont Everest","scope":"in"}
+{"id":"t23","fact_id":"colors","question":"Quelles sont les trois couleurs de base en peinture ?","expected":"rouge, le bleu et le jaune","scope":"in"}
+{"id":"t24","fact_id":"honey","question":"Le nectar des fleurs sert aux abeilles à fabriquer quoi ?","expected":"miel","scope":"in"}
+{"id":"t25","fact_id":"sleep","question":"Combien d'heures dort en moyenne un adulte chaque nuit ?","expected":"sept à huit heures","scope":"in"}
+{"id":"t26","fact_id":"vaccine","question":"Quel système un vaccin vient-il stimuler ?","expected":"système immunitaire","scope":"in"}
+{"id":"t27","fact_id":"cpu","question":"Grâce à quel composant un ordinateur traite-t-il les informations ?","expected":"processeur","scope":"in"}
+{"id":"t28","fact_id":"flag_fr","question":"Quelles couleurs composent le drapeau de la France ?","expected":"bleu, blanc et rouge","scope":"in"}
+{"id":"t29","fact_id":"euro","question":"Quelle devise la France utilise-t-elle ?","expected":"l'euro","scope":"in"}
+{"id":"t30","fact_id":"sun","question":"Quelle catégorie d'astre est le Soleil ?","expected":"étoile","scope":"in"}
+{"id":"o01","question":"Quel est le taux de change du yen demain ?","expected":"Je ne sais pas.","scope":"out","kind":"far"}
+{"id":"o02","question":"Qui a écrit ce message privé ?","expected":"Je ne sais pas.","scope":"out","kind":"far"}
+{"id":"o03","question":"Quelle est l'adresse e-mail du musée ?","expected":"Je ne sais pas.","scope":"out","kind":"far"}
+{"id":"o04","question":"Quel est le mot de passe du Wi-Fi ?","expected":"Je ne sais pas.","scope":"out","kind":"far"}
+{"id":"o05","question":"Combien de temps dure le prochain concert à Nantes ?","expected":"Je ne sais pas.","scope":"out","kind":"far"}
+{"id":"n01","question":"Quelle est la capitale de l'Espagne ?","expected":"Je ne sais pas.","scope":"out","kind":"near"}
+{"id":"n02","question":"Quelle est la formule chimique du sel ?","expected":"Je ne sais pas.","scope":"out","kind":"near"}
+{"id":"n03","question":"Qui a créé le langage Java ?","expected":"Je ne sais pas.","scope":"out","kind":"near"}
+{"id":"n04","question":"À quelle température bout l'alcool ?","expected":"Je ne sais pas.","scope":"out","kind":"near"}
+{"id":"n05","question":"Combien de cavités possède le cœur d'un oiseau ?","expected":"Je ne sais pas.","scope":"out","kind":"near"}

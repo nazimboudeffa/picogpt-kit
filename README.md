@@ -43,7 +43,10 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Réponses directes | `prepare_facts_dataset.py` | `facts_train.txt` (197 exemples, ignoré par Git) |
 | Entraînement | `train.py` | Poids Transformers dans `PicoGPT1-Daisy/` |
 | Ancrage | `rag.py` | Réponse extraite du contexte ou `Je ne sais pas.` |
-| Évaluation | `evaluate.py` | Exactitude, ancrage, abstentions, retrieval |
+| Évaluation | `evaluate.py` | Exactitude, ancrage, abstentions, retrieval ; rapport `reports/<codename>-<split>.json` |
+| Jeu de test | `eval/test.jsonl` | 40 questions jamais vues (30 reformulations + 10 hors base) |
+| Contrôle de fuite | `eval/check_leakage.py` | Vérifie que le test n'a pas servi à l'entraînement |
+| Comparaison | `compare_reports.py` | Tableau des métriques par codename |
 | Test CLI | `test.py` | Affichage d'une réponse générée (avec ou sans `--rag`) |
 | API locale | `serve.py` | `POST /generate` sur `http://127.0.0.1:8000` |
 | Export | `export_gguf.py` | `PicoGPT1-Daisy.gguf` (~328 Mo, F16) |
@@ -56,7 +59,8 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Entraînement de référence | 2 442 exemples, 5 epochs de fine-tuning GPT-2 |
 | Jeu de données | `train.txt` (2 000 Alpaca) + `rag_train.txt` (245 ancrés) + `facts_train.txt` (197 réponses directes) |
 | Base de connaissances | `knowledge.jsonl` : 30 faits en français, versionnée |
-| Évaluation RAG | 30/30 réponses exactes, 30/30 ancrées, 0 abstention à tort, 10/10 abstentions hors base |
+| Évaluation RAG (jeu train) | 30/30 réponses exactes, 30/30 ancrées, 0 abstention à tort, 10/10 abstentions hors base |
+| Benchmark figé (jeu test) | 28/30 exactes, 30/30 retrieval, 5/5 abstentions hors base éloignées, 1/5 hors base proches (`reports/daisy-test.json`) |
 | Poids locaux | `PicoGPT1-Daisy/model.safetensors` (**non versionné**) |
 | Modèle publié | [nazimboudeffa/PicoGPT1-Daisy](https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy) |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
@@ -99,7 +103,10 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 │   ├── vocab.json
 │   └── checkpoint-1000/       # checkpoint Trainer, ignoré par Git
 ├── doc/                       # documentation détaillée, chapitre par chapitre
+├── eval/                      # jeu de test figé et contrôle de fuite
+├── reports/                   # rapports de benchmark par codename (versionnés)
 ├── CHANGELOG.md               # historique des releases et des codenames
+├── compare_reports.py         # tableau comparatif des benchmarks
 ├── config.py                  # constantes partagées (lit project.json)
 ├── evaluate.py                # métriques du pipeline RAG
 ├── export_gguf.py             # Transformers → GGUF
@@ -129,12 +136,14 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 | --- | --- |
 | `config.py` | Constantes de release lues depuis `project.json` (nom, version, dépôt HF) |
 | `rename_codename.py` | Change de nom de fleur et met à jour le dépôt en une commande |
+| `eval/check_leakage.py` | Vérifie qu'aucune question du jeu de test n'a servi à l'entraînement |
+| `compare_reports.py` | Affiche les métriques des rapports de benchmark par codename |
 | `prepare_dataset.py` | Télécharge un sous-ensemble de `tatsu-lab/alpaca`, filtre les exemples invalides et écrit `train.txt` |
 | `prepare_rag_dataset.py` | Génère `rag_train.txt` depuis `knowledge.jsonl` (à lancer après `prepare_dataset.py`) |
 | `prepare_facts_dataset.py` | Génère `facts_train.txt` : questions/réponses directes et variantes, pour llama.app |
 | `train.py` | Ajuste GPT-2 sur les trois fichiers, sauvegarde dans `PicoGPT1-Daisy/` |
 | `rag.py` | TF-IDF sur `knowledge.jsonl`, vérification d'ancrage et abstention |
-| `evaluate.py` | Mesure exactitude, ancrage, abstentions et retrieval du pipeline RAG |
+| `evaluate.py` | Mesure exactitude, ancrage, abstentions et retrieval ; `--split test` utilise le jeu figé et écrit un rapport |
 | `model_utils.py` | `load_model()` et `generate()`, utilisés par `test.py`, `serve.py` et `rag.py` |
 | `test.py` | Interface CLI pour générer une réponse, avec ou sans ancrage (`--rag`) |
 | `serve.py` | Serveur HTTP local basé sur la bibliothèque standard |
@@ -259,8 +268,11 @@ python prepare_rag_dataset.py                   # crée rag_train.txt depuis kno
 python prepare_facts_dataset.py                 # crée facts_train.txt (Q/R directes)
 python train.py                                 # ajuste GPT-2 sur les trois fichiers
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
-python evaluate.py              # métriques d'ancrage et d'abstention
-python serve.py                 # API locale sur le port 8000
+python eval/check_leakage.py                # vérifie la séparation train/test
+python evaluate.py                          # diagnostic sur knowledge.jsonl
+python evaluate.py --split test             # benchmark figé + rapport JSON
+python compare_reports.py                   # compare les codenames
+python serve.py                             # API locale sur le port 8000
 ```
 
 Publication et export (nécessitent `huggingface-cli login`) :
@@ -778,29 +790,29 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 
 - Jeu de données réduit : 2 000 exemples Alpaca filtrés + 245 exemples d'ancrage.
 - Modèle GPT-2 complet (124 M paramètres) mais contexte effectivement limité à 256 tokens ; le GGUF F16 fait environ 328 Mo (les poids Transformers FP32 font 498 Mo).
-- Aucun jeu de validation : le loss affiché est uniquement le loss d'entraînement.
+- Aucun jeu de validation **pendant l'entraînement** : le loss affiché est uniquement le loss d'entraînement. Le jeu de test figé évalue le modèle après coup, mais ne pilote pas encore `eval_loss`.
 - Échantillonnage par défaut avec arrêt au saut de ligne ; le mode `--greedy` boucle encore.
 - GGUF exporté en F16, sans quantification.
 
 ### Limites du pipeline RAG
 
 - Base **fermée de 30 faits** : aucune question hors de `knowledge.jsonl` ne peut recevoir de réponse factuelle (abstention attendue).
-- Les **30 questions de la base** obtiennent désormais la bonne réponse exacte et ancrée. Ce résultat reste limité aux formulations apprises : une reformulation éloignée peut retomber en abstention.
-- Seuil `DEFAULT_MIN_SCORE = 0.50` à recalibrer selon les reformulations et la taille de la base.
+- Les **30 questions de la base** obtiennent la bonne réponse exacte et ancrée, mais ce score est optimiste : sur 30 reformulations jamais vues, on tombe à 28/30.
+- Les questions **hors base proches d'un fait connu** posent le plus de problèmes : 1/5 abstention seulement. Le modèle recopie la réponse du fait le plus proche (capitale de l'Espagne → Paris, formule du sel → H2O). C'est la cible prioritaire de la prochaine itération.
+- Seuil `DEFAULT_MIN_SCORE = 0.50` à recalibrer sur le jeu de test, pas à la main.
 - Dépendance à **scikit-learn** (`sklearn`) pour le TF-IDF ; l'ancrage n'existe pas dans le GGUF / llama.cpp.
-- Aucune validation croisée du retrieval ni du seuil : `evaluate.py` fournit un diagnostic ponctuel, pas un jeu de validation.
 
-Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md).
+Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md) et [doc/14-benchmark.md](doc/14-benchmark.md).
 
 ### Améliorations possibles
 
 1. Augmenter `--max-examples` de `prepare_dataset.py` **et** de `train.py` (limite actuelle : 3 000).
 2. Essayer un autre modèle de départ via `--pretrained-model`, ou augmenter le nombre d'epochs.
-3. Réserver 10 % des exemples pour un jeu de validation et suivre `eval_loss`.
+3. Réserver 10 % des exemples pour un jeu de validation et suivre `eval_loss` (le jeu de test figé, lui, existe déjà).
 4. Ajuster `temperature`, `top_p`, `top_k`, `repetition_penalty` et `no_repeat_ngram_size` selon l'usage.
 5. Exporter le GGUF en `Q4_K_M` pour réduire sa taille et accélérer l'inférence.
-6. Étendre `knowledge.jsonl`, recalibrer `--min-score` et comparer plusieurs valeurs de `--rag-k` avec `evaluate.py`.
-7. Pousser les commits locaux sur GitHub si le dépôt doit être partagé.
+6. Étendre `knowledge.jsonl`, recalibrer `--min-score` et comparer plusieurs valeurs de `--rag-k` avec `evaluate.py --split test` puis `compare_reports.py`.
+7. Corriger les hallucinations sur les questions hors base proches, en utilisant `reports/<codename>-test.json` comme référence.
 
 ---
 
@@ -812,6 +824,7 @@ Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md).
 - Documentation détaillée : [doc/README.md](doc/README.md)
 - Pipeline RAG / ancrage : [doc/12-rag.md](doc/12-rag.md)
 - Versions et noms de fleurs : [doc/13-versions.md](doc/13-versions.md)
+- Protocole de benchmark : [doc/14-benchmark.md](doc/14-benchmark.md)
 - Historique des releases : [CHANGELOG.md](CHANGELOG.md)
 - Fiche modèle : [MODEL_CARD.md](MODEL_CARD.md)
 - llama.app : <https://llama.app>

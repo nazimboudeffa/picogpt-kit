@@ -35,7 +35,7 @@ from config import (
 
 TEXT_SUFFIXES = {".py", ".md", ".txt", ".json", ".jinja", ".yml", ".yaml"}
 EXCLUDED_FILES = {PROJECT_FILE.name, "vocab.json", "tokenizer.json"}
-EXCLUDED_DIRS = {".git", ".venv", "__pycache__", MODEL_DIR}
+EXCLUDED_DIRS = {".git", ".venv", "__pycache__", "reports", MODEL_DIR}
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[\w.]+)?$")
 CODENAME_RE = re.compile(r"^[A-Za-z][A-Za-z-]*$")
 
@@ -84,7 +84,14 @@ def add_changelog_entry(version, codename, old_name, new_name, dry_run):
         f"## [{version}] — {codename} — {date.today().isoformat()}\n\n"
         f"Changement de codename : `{old_name}` → `{new_name}`.\n\n"
     )
-    index = text.find("## [")
+    unreleased = text.find("## [Non publié]")
+    if unreleased != -1:
+        # La section « Non publié » reste en tête : la nouvelle release prend
+        # sa place juste en dessous, avant les versions déjà publiées.
+        index = text.find("## [", unreleased + len("## [Non publié]"))
+    else:
+        index = text.find("## [")
+
     if index == -1:
         text = text.rstrip() + "\n\n" + entry
     else:

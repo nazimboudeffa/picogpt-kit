@@ -17,6 +17,7 @@ Cette documentation décrit le dépôt local, l'entraînement, la génération, 
 11. [Limites et pistes d'amélioration](11-limites.md)
 12. [Ancrage / RAG](12-rag.md)
 13. [Versions et noms de fleurs](13-versions.md)
+14. [Protocole de benchmark](14-benchmark.md)
 
 ## Démarrage rapide
 
@@ -28,6 +29,9 @@ python prepare_facts_dataset.py
 python train.py
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
 python evaluate.py
+python eval/check_leakage.py
+python evaluate.py --split test
+python compare_reports.py
 ```
 
 Serveur local :
