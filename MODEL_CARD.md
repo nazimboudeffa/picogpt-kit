@@ -76,7 +76,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 
 ## Ancrage (RAG)
 
-Le dépôt fournit un pipeline d'ancrage côté Python : `rag.py` récupère un fait dans `knowledge.jsonl` avec un TF-IDF (`char_wb` 3-5) sur `text + question`, construit le prompt `Contexte: <texte> | Question: <question>\n`, génère en beam search déterministe (`num_beams=5`) puis vérifie `is_supported()`. Si le score est inférieur à 0,50 ou si la réponse n'est pas extraite du contexte, le modèle répond `Je ne sais pas.`
+Le dépôt fournit un pipeline d'ancrage côté Python : `rag.py` récupère un fait dans `knowledge.jsonl` avec un TF-IDF (`char_wb` 3-5) sur `text + question`, construit le prompt `Contexte: <texte> | Question: <question>\n`, génère en beam search déterministe (`num_beams=5`) puis vérifie `is_supported()`. Si le score est inférieur à 0,40 ou si la réponse n'est pas extraite du contexte, le modèle répond `Je ne sais pas.`
 
 - `python test.py --prompt "Quelle est la capitale de la France ?" --rag`
 - `python evaluate.py` (nécessite `scikit-learn`)

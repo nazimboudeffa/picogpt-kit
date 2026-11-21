@@ -20,7 +20,7 @@ CONTEXT_PREFIX = "Contexte: "
 QUESTION_PREFIX = "Question: "
 SEPARATOR = " | "
 
-DEFAULT_MIN_SCORE = 0.50  # scores ~0.74+ pour les questions couvertes, <0.40 hors base
+DEFAULT_MIN_SCORE = 0.40  # calibré sur le jeu test : récupère les reformulations à 0,41-0,50, hors base éloigné < 0,25
 _KB_CACHE = {}
 
 

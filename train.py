@@ -29,6 +29,7 @@ DATA_PATHS = [
     Path("train.txt"),
     Path("rag_train.txt"),
     Path("facts_train.txt"),
+    Path("negative_train.txt"),
 ]
 OUTPUT_DIR = Path(MODEL_DIR)
 

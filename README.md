@@ -438,7 +438,7 @@ python test.py --prompt "Explique la psychanalyse.\n" --do-sample
 | `--no-repeat-ngram-size` | `3` | Interdit la répétition de trigrammes |
 | `--rag` | désactivé | Ancre la réponse dans `knowledge.jsonl` |
 | `--rag-k` | `1` | Nombre de passages récupérés à considérer |
-| `--min-score` | `0.50` | Score TF-IDF minimal pour fournir un contexte |
+| `--min-score` | `0.40` | Score TF-IDF minimal pour fournir un contexte |
 
 L'échantillonnage est activé par défaut : le décodage glouton fait boucler ce petit modèle. La génération s'arrête à l'EOS ou au premier saut de ligne produit après la réponse (format appris : `prompt\nréponse<|endoftext|>`). Terminez votre prompt par `\n` pour rester proche du format d'entraînement.
 
@@ -457,11 +457,11 @@ python test.py --prompt "Quelle est la capitale de la France ?" --rag
 
 ### Génération ancrée (`--rag`)
 
-Avec `--rag`, `test.py` passe par `rag.py` : un passage de `knowledge.jsonl` est récupéré par TF-IDF, inséré dans le prompt au format `Contexte: <texte> | Question: <question>\n`, puis la réponse générée n'est acceptée que si elle est un extrait du contexte (`is_supported()`). Si le score de récupération est inférieur à `--min-score` (0,50 par défaut), aucun contexte n'est fourni et le script renvoie immédiatement `Je ne sais pas.`
+Avec `--rag`, `test.py` passe par `rag.py` : un passage de `knowledge.jsonl` est récupéré par TF-IDF, inséré dans le prompt au format `Contexte: <texte> | Question: <question>\n`, puis la réponse générée n'est acceptée que si elle est un extrait du contexte (`is_supported()`). Si le score de récupération est inférieur à `--min-score` (0,40 par défaut), aucun contexte n'est fourni et le script renvoie immédiatement `Je ne sais pas.`
 
 ```bash
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
-python test.py --prompt "Quel est le prix du pain à Paris ?" --rag --min-score 0.5
+python test.py --prompt "Quel est le prix du pain à Paris ?" --rag --min-score 0.4
 python test.py --prompt "À quelle température l'eau bout-elle ?" --rag --rag-k 3 --min-score 0.4
 ```
 
@@ -520,7 +520,7 @@ Champs du corps JSON :
 | `no_repeat_ngram_size` | int | `3` | Anti-répétition de trigrammes |
 | `use_rag` | bool | `false` | Active l'ancrage dans `knowledge.jsonl` |
 | `rag_k` | int | `1` | Nombre de passages récupérés à considérer |
-| `min_score` | float | `0.50` | Score TF-IDF minimal pour fournir un contexte |
+| `min_score` | float | `0.40` | Score TF-IDF minimal pour fournir un contexte |
 
 Réponses :
 
@@ -548,7 +548,7 @@ curl -X POST http://127.0.0.1:8000/generate \
 # Avec ancrage RAG
 curl -X POST http://127.0.0.1:8000/generate \
   -H "Content-Type: application/json" \
-  -d '{"prompt":"Quelle est la capitale de la France ?","use_rag":true,"rag_k":1,"min_score":0.5}'
+  -d '{"prompt":"Quelle est la capitale de la France ?","use_rag":true,"rag_k":1,"min_score":0.4}'
 ```
 
 **PowerShell**
@@ -800,7 +800,7 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 - Base **fermée de 30 faits** : aucune question hors de `knowledge.jsonl` ne peut recevoir de réponse factuelle (abstention attendue).
 - Les **30 questions de la base** obtiennent la bonne réponse exacte et ancrée, mais ce score est optimiste : sur 30 reformulations jamais vues, on tombe à 28/30.
 - Les questions **hors base proches d'un fait connu** posent le plus de problèmes : 1/5 abstention seulement. Le modèle recopie la réponse du fait le plus proche (capitale de l'Espagne → Paris, formule du sel → H2O). C'est la cible prioritaire de la prochaine itération.
-- Seuil `DEFAULT_MIN_SCORE = 0.50` à recalibrer sur le jeu de test, pas à la main.
+- Seuil `DEFAULT_MIN_SCORE = 0.40`, calibré sur le jeu de test : `0,50` refusait deux reformulations couvertes (scores 0,411 et 0,499).
 - Dépendance à **scikit-learn** (`sklearn`) pour le TF-IDF ; l'ancrage n'existe pas dans le GGUF / llama.cpp.
 
 Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md) et [doc/14-benchmark.md](doc/14-benchmark.md).

@@ -35,6 +35,7 @@ checkpoint-*/
 train.txt
 rag_train.txt
 facts_train.txt
+negative_train.txt
 *.csv
 *.tsv
 *.jsonl

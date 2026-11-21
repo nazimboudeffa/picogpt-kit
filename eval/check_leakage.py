@@ -24,6 +24,7 @@ TRAIN_PATHS = [
     ROOT / "train.txt",
     ROOT / "rag_train.txt",
     ROOT / "facts_train.txt",
+    ROOT / "negative_train.txt",
 ]
 
 
