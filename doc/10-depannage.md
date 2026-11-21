@@ -43,13 +43,13 @@ llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
 
 ## Les réponses sont incohérentes
 
-C'est attendu : 500 exemples et 6,86 M paramètres sont très peu pour un assistant. Essayez :
+Le modèle par défaut est un GPT-2 pré-entraîné ajusté sur 2 245 exemples, ce qui améliore la fluence mais ne garantit pas l'exactitude. Vérifiez d'abord que le GGUF utilisé dans llama.app est bien celui issu du dernier entraînement (`python export_gguf.py`). Pour une réponse factuelle vérifiée, utilisez l'ancrage côté Python :
 
 ```bash
-python test.py --prompt "Votre texte\n" --do-sample
+python test.py --prompt "Quelle est la capitale de la France ?" --rag
 ```
 
-Pour de meilleurs résultats, augmentez le nombre d'exemples et la taille du modèle.
+Pour de meilleurs résultats en génération libre, augmentez le nombre d'exemples (`--max-examples`) ou le nombre d'epochs (`--epochs`).
 
 ## Port 8000 déjà utilisé
 

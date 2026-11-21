@@ -5,11 +5,11 @@
 La préparation se fait en deux étapes, **dans cet ordre** :
 
 ```bash
-python prepare_dataset.py       # Alpaca filtré → train.txt
-python prepare_rag_dataset.py   # knowledge.jsonl → rag_train.txt
+python prepare_dataset.py --max-examples 2000   # Alpaca filtré → train.txt
+python prepare_rag_dataset.py                   # knowledge.jsonl → rag_train.txt
 ```
 
-`prepare_dataset.py` télécharge le split `train` de `tatsu-lab/alpaca`, **filtre les exemples invalides** puis écrit jusqu'à **500 exemples valides** dans `train.txt`. Sont écartés :
+`prepare_dataset.py` télécharge le split `train` de `tatsu-lab/alpaca`, **filtre les exemples invalides** puis écrit jusqu'à **500 exemples valides** dans `train.txt` (ou 2 000 avec `--max-examples 2000`, recommandé). Sont écartés :
 
 - les réponses (ou prompts) sur plusieurs lignes, que le parseur de `train.py` ne peut pas lire ;
 - les doublons de couples prompt / réponse ;
@@ -66,10 +66,10 @@ Je ne sais pas.
 
 Dans `prepare_dataset.py` :
 
-| Constante | Valeur | Rôle |
+| Constante / option | Valeur | Rôle |
 | --- | --- | --- |
-| `MAX_EXAMPLES` | `500` | Nombre maximum d'exemples Alpaca valides écrits |
-| `OUTPUT_FILE` | `train.txt` | Fichier de sortie |
+| `MAX_EXAMPLES` / `--max-examples` | `500` | Nombre maximum d'exemples Alpaca valides écrits |
+| `OUTPUT_FILE` / `--output-file` | `train.txt` | Fichier de sortie |
 
 Dans `prepare_rag_dataset.py` :
 
@@ -83,9 +83,9 @@ Dans `train.py` :
 | Constante | Valeur | Rôle |
 | --- | --- | --- |
 | `DATA_PATHS` | `[train.txt, rag_train.txt]` | Fichiers lus à l'entraînement |
-| `MAX_EXAMPLES` | `2000` | Nombre maximum d'exemples, tous fichiers confondus |
+| `MAX_EXAMPLES` / `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 
-L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total actuel est de 745 exemples (500 + 245), sous la limite de 2 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Daisy/` quand il y est, sinon depuis `gpt2` (évite une requête réseau TLS).
+L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total utilisé pour le dernier entraînement est de 2 245 exemples (2 000 + 245), sous la limite de 3 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Daisy/` quand il y est, sinon depuis le modèle de départ (évite une requête réseau TLS).
 
 ## Dataset personnalisé
 

@@ -1,38 +1,53 @@
 # 4. Entraînement
 
-## Commande
+## Commande recommandée
 
 ```bash
-python train.py
+python prepare_dataset.py --max-examples 2000   # train.txt : 2 000 exemples Alpaca filtrés
+python prepare_rag_dataset.py                   # rag_train.txt : 245 exemples ancrés
+python train.py                                 # fine-tuning de GPT-2 (défaut)
 ```
 
-Le script nécessite `train.txt` (voir [dataset](03-dataset.md)).
+Le script nécessite `train.txt` et, idéalement, `rag_train.txt` (voir [dataset](03-dataset.md)).
 
-## Constantes configurables
+`train.py` part par défaut du modèle pré-entraîné `gpt2` (124 M paramètres, 12 couches, 768 dimensions). C'est le réglage qui donne des réponses cohérentes dans le GGUF / llama.app : un modèle entraîné de zéro sur quelques milliers d'exemples ne peut pas apprendre la langue correctement, même en agrandissant l'architecture.
 
-En haut de `train.py` :
+## Retour à l'entraînement depuis zéro
 
-| Constante | Valeur par défaut | Description |
+```bash
+python train.py --init scratch --n-layer 4 --n-embd 256 --n-head 4
+```
+
+Les options `--n-layer`, `--n-embd` et `--n-head` ne sont utilisées qu'avec `--init scratch` ; elles sont ignorées en mode `pretrained`, où l'architecture est fixée par les poids de départ.
+
+## Options CLI
+
+| Option | Défaut | Description |
 | --- | --- | --- |
-| `DATA_PATH` | `train.txt` | Fichier d'exemples |
-| `OUTPUT_DIR` | `PicoGPT1-Daisy` | Dossier de sauvegarde |
-| `MAX_LEN` | `256` | Longueur maximale du contexte |
-| `MAX_EXAMPLES` | `500` | Nombre d'exemples utilisés |
-| `EPOCHS` | `10` | Nombre d'epochs |
-| `BATCH_SIZE` | `4` | Taille du batch |
-| `LEARNING_RATE` | `5e-4` | Taux d'apprentissage |
+| `--data-paths` | `train.txt rag_train.txt` | Fichiers d'exemples (un fichier absent est ignoré) |
+| `--output-dir` | `PicoGPT1-Daisy` | Dossier de sauvegarde |
+| `--max-len` | `256` | Longueur maximale du contexte |
+| `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
+| `--epochs` | `3` en fine-tuning, `10` depuis zéro | Nombre d'epochs |
+| `--batch-size` | `4` | Taille du batch |
+| `--lr` | `5e-5` en fine-tuning, `5e-4` depuis zéro | Taux d'apprentissage |
+| `--init` | `pretrained` | `pretrained` (recommandé) ou `scratch` |
+| `--pretrained-model` | `gpt2` | Identifiant Hugging Face du modèle de départ |
+| `--n-layer` / `--n-embd` / `--n-head` | `4` / `256` / `4` | Architecture en mode `scratch` |
+| `--save-steps` | `1000` | Fréquence des checkpoints intermédiaires |
+| `--fp16` | désactivé | Demi-précision ; à utiliser uniquement avec CUDA (`torch.cuda.is_available()`) |
 
-`MAX_LEN` est aussi utilisé dans `model_utils.py` pour tronquer les prompts à la génération : les deux valeurs doivent rester identiques.
+`MAX_LEN` est aussi utilisé dans `model_utils.py` pour tronquer les prompts à la génération : les deux valeurs doivent rester identiques. Le modèle pré-entraîné garde ses 1 024 positions : seules les 256 premières sont utilisées, puisque les exemples sont tronqués à `max_len`.
 
 ## Ce que fait le script
 
-1. Charge le tokenizer GPT-2 (`gpt2`) et utilise `<|endoftext|>` comme token de padding.
+1. Charge le tokenizer depuis `--output-dir` s'il y est, sinon depuis le modèle de départ : même vocabulaire, pas de requête réseau inutile.
 2. Définit un `chat_template` correspondant au format appris : `prompt\nreponse<|endoftext|>`.
-3. Lit `train.txt` et tokenise chaque exemple.
+3. Lit les fichiers de données et tokenise chaque exemple (tronqué à `max_len`).
 4. Masque le prompt dans les labels (`-100`) : la loss ne porte que sur la réponse.
-5. Construit un `GPT2LMHeadModel` avec la configuration décrite dans [architecture](09-architecture.md).
-6. Entraîne avec `Trainer` (`logging_steps=50`, `save_steps=1000`).
-7. Sauvegarde le modèle et le tokenizer dans `PicoGPT1-Daisy/`.
+5. Charge GPT-2 pré-entraîné ou construit un `GPT2LMHeadModel` aléatoire selon `--init`.
+6. Entraîne avec `Trainer` (`logging_steps=50`, `save_steps` configurable).
+7. Sauvegarde le modèle et le tokenizer dans `--output-dir`.
 
 ## Sorties
 
@@ -40,20 +55,18 @@ Fichiers générés dans `PicoGPT1-Daisy/` :
 
 - `config.json`
 - `generation_config.json`
-- `model.safetensors` (ignoré par Git)
+- `model.safetensors` (ignoré par Git, ~500 Mo avec GPT-2 complet)
 - `merges.txt`, `vocab.json`, `tokenizer.json`
 - `special_tokens_map.json`, `tokenizer_config.json`
 
-Un dossier `checkpoint-1250/` peut aussi apparaître ; il est ignoré par Git et peut être supprimé sans risque.
+Un dossier de checkpoint peut apparaître ; il est ignoré par Git et peut être supprimé sans risque.
 
-## Durée et métriques
+Après l'entraînement, régénérez le GGUF pour llama.app :
 
-Sur CPU, l'exécution complète prend environ **2 min 40**. Dernier entraînement observé :
-
-```
-train_runtime : 160 s
-train_loss    : 5,90
-loss finale   : 4,95
+```bash
+python export_gguf.py
 ```
 
-Le loss reste élevé : le modèle est volontairement minuscule et entraîné sur peu de données.
+## Durée observée
+
+Dernier fine-tuning (2 245 exemples, 3 epochs, 1 686 steps) : **134,7 s sur RTX 3070** en `--fp16` (12,5 steps/s, ~50 exemples/s), contre ~55 min sur CPU. Loss moyenne : 1,91 ; dernière loss journalisée : 1,59.

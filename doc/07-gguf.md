@@ -19,7 +19,7 @@ Le fichier généré est ignoré par Git (`*.gguf` dans `.gitignore`).
 3. Lance la conversion avec `--outtype f16`.
 4. Supprime les fichiers temporaires à la fin.
 
-Le modèle GPT-2 est pris en charge par le convertisseur. La taille du GGUF généré est d'environ **26,7 Mo** pour 29 tenseurs.
+Le modèle GPT-2 est pris en charge par le convertisseur. Avec le GPT-2 complet (124 M paramètres), le GGUF F16 généré fait environ **328 Mo** pour 149 tenseurs (les poids Transformers FP32 occupent 498 Mo).
 
 ## Vérification locale
 

@@ -21,6 +21,5 @@
   "tokenizer_class": "GPT2Tokenizer",
   "truncation_side": "right",
   "truncation_strategy": "longest_first",
-  "unk_token": "<|endoftext|>",
-  "chat_template": "{% for message in messages %}{{ message['content'] }}{% if not loop.last %}{{ '\\n' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '\\n' }}{% endif %}"
+  "unk_token": "<|endoftext|>"
 }

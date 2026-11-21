@@ -2,21 +2,23 @@
 
 ## Configuration
 
-Définie dans `train.py` et sauvegardée dans `PicoGPT1-Daisy/config.json` :
+Héritée de GPT-2 pré-entraîné (mode `--init pretrained`, défaut) et sauvegardée dans `PicoGPT1-Daisy/config.json` :
 
 | Paramètre | Valeur |
 | --- | --- |
 | `model_type` | `gpt2` |
 | `architectures` | `GPT2LMHeadModel` |
-| `n_layer` | `2` |
-| `n_embd` | `128` |
-| `n_head` | `2` |
-| `n_positions` / `n_ctx` | `256` |
+| `n_layer` | `12` |
+| `n_embd` | `768` |
+| `n_head` | `12` |
+| `n_positions` / `n_ctx` | `1024` |
 | `vocab_size` | `50 257` |
 | `activation_function` | `gelu_new` |
 | `torch_dtype` | `float32` |
 
-Nombre de paramètres : environ **6,86 M**.
+Nombre de paramètres : **124 439 808**. Les exemples sont tronqués à 256 tokens à l'entraînement et à la génération (`MAX_LEN` dans `model_utils.py`) : seules les 256 premières positions sont donc utilisées en pratique.
+
+En mode `--init scratch`, l'architecture est construite dans `train.py` (`--n-layer 4`, `--n-embd 256`, `--n-head 4`, contexte 256) et le nombre de paramètres est d'environ 16,1 M. Cette configuration est conservée pour la démonstration, mais elle donne des réponses nettement moins cohérentes.
 
 ## Tokenizer
 

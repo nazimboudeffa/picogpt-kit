@@ -7,6 +7,7 @@ lignes sont écartés (le parseur ne lit que les deux premières lignes).
 Quelques réponses factuellement fausses du jeu Alpaca sont aussi filtrées.
 """
 
+import argparse
 import re
 
 from datasets import load_dataset
@@ -35,6 +36,16 @@ def _is_valid(prompt, output):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Prépare train.txt depuis Alpaca")
+    parser.add_argument(
+        "--max-examples",
+        type=int,
+        default=MAX_EXAMPLES,
+        help=f"nombre maximum d'exemples valides (défaut : {MAX_EXAMPLES})",
+    )
+    parser.add_argument("--output-file", default=OUTPUT_FILE)
+    args = parser.parse_args()
+
     print("Téléchargement de tatsu-lab/alpaca (train split)...")
     ds = load_dataset("tatsu-lab/alpaca", split="train")
 
@@ -60,11 +71,11 @@ def main():
         seen.add(key)
         examples.append((prompt, output))
 
-        if len(examples) >= MAX_EXAMPLES:
+        if len(examples) >= args.max_examples:
             break
 
-    print(f"Écriture de {len(examples)} exemples valides dans {OUTPUT_FILE}...")
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    print(f"Écriture de {len(examples)} exemples valides dans {args.output_file}...")
+    with open(args.output_file, "w", encoding="utf-8") as f:
         for i, (prompt, response) in enumerate(examples):
             f.write(f"{prompt}\n{response}")
             if i < len(examples) - 1:

@@ -47,7 +47,7 @@ python prepare_rag_dataset.py   # rag_train.txt : exemples ancrés + abstention
 python train.py                 # DATA_PATHS = [train.txt, rag_train.txt]
 ```
 
-`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` (l'ancien `DATA_PATH` a disparu) et `MAX_EXAMPLES = 2000`. Le jeu actuel fait **745 exemples**, chargés en 10 epochs (~1 860 steps, loss finale ≈ 4,54). Le tokenizer est pris dans `PicoGPT1-Daisy/` s'il y est, sinon depuis `gpt2` : cela évite une requête réseau TLS et garantit le même vocabulaire.
+`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` et `MAX_EXAMPLES = 3000`. Le dernier entraînement porte sur **2 245 exemples** (2 000 Alpaca + 245 ancrés), en fine-tuning de GPT-2 sur 3 epochs (~1 686 steps). Le tokenizer est pris dans `PicoGPT1-Daisy/` s'il y est, sinon depuis le modèle de départ : cela évite une requête réseau TLS et garantit le même vocabulaire.
 
 Génération et évaluation :
 
@@ -103,14 +103,14 @@ Commande : `python evaluate.py`
 | Mesure | Résultat |
 | --- | --- |
 | Questions dans la base | 30 |
-| Réponses exactes | 9/30 |
+| Réponses exactes | 10/30 |
 | Réponses ancrées | 30/30 |
 | Abstentions à tort | 0/30 |
 | Retrieval correct | 30/30 |
 | Questions hors base | 10 |
 | Abstentions correctes | 10/10 |
 
-Interprétation : le modèle ne fabrique plus de fait absent du contexte ; l'extrait choisi n'est pas toujours le meilleur (9 exacts), mais il est toujours supporté par le texte récupéré.
+Interprétation : le modèle ne fabrique plus de fait absent du contexte ; l'extrait choisi n'est pas toujours le meilleur (10 exacts), mais il est toujours supporté par le texte récupéré.
 
 ## Limites
 

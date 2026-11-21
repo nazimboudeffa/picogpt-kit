@@ -10,13 +10,13 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 
 | Élément | État |
 | --- | --- |
-| Entraînement | Terminé (745 exemples, 10 epochs, ~1 860 steps, loss finale ≈ 4,54) |
+| Entraînement | Fine-tuning GPT-2 sur 2 245 exemples, 3 epochs (~1 686 steps) |
 | Poids locaux | `PicoGPT1-Daisy/model.safetensors` (non versionné) |
 | Publication | https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Branche Git locale | `main` |
 
-> Le modèle est expérimental et très petit : les réponses générées sont souvent incohérentes. C'est un projet d'apprentissage, pas un assistant généraliste.
+> Le modèle est expérimental : malgré le passage à GPT-2 pré-entraîné, les réponses générées restent approximatives. C'est un projet d'apprentissage, pas un assistant généraliste.
 
 ## Arborescence
 
