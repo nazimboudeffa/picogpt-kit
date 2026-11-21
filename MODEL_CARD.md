@@ -1,5 +1,7 @@
 ---
 library_name: transformers
+version: 1.0.0
+codename: daisy
 tags:
   - gpt2
   - gguf
@@ -13,6 +15,8 @@ tags:
 ---
 
 # PicoGPT1-Daisy
+
+> Release `1.0.0` — codename Daisy. Les versions et les noms de fleurs sont décrits dans le dépôt source (`CHANGELOG.md`).
 
 GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, 245 exemples d'ancrage et 197 questions/réponses directes issus d'une base fermée de 30 faits (2 442 exemples au total).
 

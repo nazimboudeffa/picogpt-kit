@@ -8,6 +8,7 @@ Usage :
 
 import argparse
 
+from config import MODEL_NAME
 from model_utils import (
     DEFAULT_MAX_NEW_TOKENS,
     DEFAULT_NO_REPEAT_NGRAM_SIZE,
@@ -23,7 +24,7 @@ from rag import DEFAULT_MIN_SCORE, answer_with_rag
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Génère une réponse avec PicoGPT1-Daisy")
+    parser = argparse.ArgumentParser(description=f"Génère une réponse avec {MODEL_NAME}")
     parser.add_argument("--model-dir", default=MODEL_DIR, help="dossier du modèle entraîné")
     parser.add_argument("--prompt", default="What is the capital of France?\n", help="prompt à compléter")
     parser.add_argument(

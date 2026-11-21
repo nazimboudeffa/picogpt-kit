@@ -62,6 +62,24 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Versions utilisées | Python 3.13 / Windows 11, `transformers` 4.52.4, `huggingface_hub` 0.33.0, `torch` CPU |
 
+### Versions et noms de fleurs
+
+Chaque itération porte un nom de fleur (codename). La convention et la procédure de renommage sont détaillées dans [doc/13-versions.md](doc/13-versions.md).
+
+| Release | Codename | Portée |
+| --- | --- | --- |
+| `0.x` | Jasmine | prototype historique, conservé tel quel |
+| `1.0.0` | Daisy | GPT-2 124 M, RAG, GGUF |
+
+Le nom, la version et l'identifiant Hugging Face ne sont définis qu'une seule fois, dans `project.json`. Les scripts les lisent via `config.py`. Pour passer à la fleur suivante :
+
+```bash
+python rename_codename.py --codename Iris --version 1.1.0 --dry-run   # aperçu
+python rename_codename.py --codename Iris --version 1.1.0             # application
+```
+
+Le script met à jour `project.json`, les fichiers texte, le `CHANGELOG.md`, et renomme le dossier de poids ainsi que le GGUF. Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique.
+
 Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 
 ---
@@ -81,6 +99,8 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 │   ├── vocab.json
 │   └── checkpoint-1000/       # checkpoint Trainer, ignoré par Git
 ├── doc/                       # documentation détaillée, chapitre par chapitre
+├── CHANGELOG.md               # historique des releases et des codenames
+├── config.py                  # constantes partagées (lit project.json)
 ├── evaluate.py                # métriques du pipeline RAG
 ├── export_gguf.py             # Transformers → GGUF
 ├── knowledge.jsonl            # base fermée de 30 faits (versionnée)
@@ -88,15 +108,17 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 ├── prepare_dataset.py         # téléchargement Alpaca → train.txt
 ├── prepare_rag_dataset.py     # knowledge.jsonl → rag_train.txt
 ├── prepare_facts_dataset.py   # knowledge.jsonl → facts_train.txt
+├── project.json               # source de vérité : version, codename, dépôt HF
 ├── publish_hf.py              # publication du modèle sur Hugging Face
 ├── rag.py                     # TF-IDF, vérification d'ancrage, abstention
+├── rename_codename.py         # change de fleur en une commande
 ├── serve.py                   # serveur HTTP local
 ├── test.py                    # génération en ligne de commande
 ├── train.py                   # entraînement
 ├── train.txt                  # dataset généré, ignoré par Git
 ├── rag_train.txt              # dataset ancré généré, ignoré par Git
 ├── facts_train.txt            # Q/R directes générées, ignoré par Git
-├── PicoGPT1-Daisy.gguf      # export GGUF, ignoré par Git
+├── PicoGPT1-Daisy.gguf        # export GGUF, ignoré par Git
 ├── MODEL_CARD.md              # fiche modèle publiée sur le Hub
 └── README.md                  # ce fichier
 ```
@@ -105,6 +127,8 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 
 | Fichier | Responsabilité |
 | --- | --- |
+| `config.py` | Constantes de release lues depuis `project.json` (nom, version, dépôt HF) |
+| `rename_codename.py` | Change de nom de fleur et met à jour le dépôt en une commande |
 | `prepare_dataset.py` | Télécharge un sous-ensemble de `tatsu-lab/alpaca`, filtre les exemples invalides et écrit `train.txt` |
 | `prepare_rag_dataset.py` | Génère `rag_train.txt` depuis `knowledge.jsonl` (à lancer après `prepare_dataset.py`) |
 | `prepare_facts_dataset.py` | Génère `facts_train.txt` : questions/réponses directes et variantes, pour llama.app |
@@ -787,5 +811,7 @@ Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md).
 - Dataset : <https://huggingface.co/datasets/tatsu-lab/alpaca>
 - Documentation détaillée : [doc/README.md](doc/README.md)
 - Pipeline RAG / ancrage : [doc/12-rag.md](doc/12-rag.md)
+- Versions et noms de fleurs : [doc/13-versions.md](doc/13-versions.md)
+- Historique des releases : [CHANGELOG.md](CHANGELOG.md)
 - Fiche modèle : [MODEL_CARD.md](MODEL_CARD.md)
 - llama.app : <https://llama.app>

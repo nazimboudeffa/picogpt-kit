@@ -14,6 +14,7 @@ conservé pour la démonstration pédagogique.
 import argparse
 from pathlib import Path
 
+from config import MODEL_DIR, MODEL_NAME
 from datasets import Dataset
 from transformers import (
     DataCollatorForSeq2Seq,
@@ -29,7 +30,7 @@ DATA_PATHS = [
     Path("rag_train.txt"),
     Path("facts_train.txt"),
 ]
-OUTPUT_DIR = Path("PicoGPT1-Daisy")
+OUTPUT_DIR = Path(MODEL_DIR)
 
 MAX_LEN = 256          # taille du contexte
 MAX_EXAMPLES = 3000    # assez pour 2 000 exemples Alpaca + les exemples RAG
@@ -90,7 +91,7 @@ def load_datasets(tokenizer, paths=DATA_PATHS, max_examples=MAX_EXAMPLES, max_le
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Entraîne ou ajuste PicoGPT1-Daisy")
+    parser = argparse.ArgumentParser(description=f"Entraîne ou ajuste {MODEL_NAME}")
     parser.add_argument("--data-paths", nargs="+", type=Path, default=DATA_PATHS)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     parser.add_argument("--max-len", type=int, default=MAX_LEN)

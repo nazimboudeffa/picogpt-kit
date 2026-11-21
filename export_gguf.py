@@ -1,4 +1,4 @@
-"""Convertit PicoGPT1-Daisy en GGUF pour llama.app / llama.cpp.
+"""Convertit le modèle courant en GGUF pour llama.app / llama.cpp.
 
 Le convertisseur est téléchargé depuis une version épinglée de llama.cpp ;
 le paquet Python `gguf` est installé dans un dossier temporaire si besoin.
@@ -11,8 +11,10 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-MODEL_DIR = Path("PicoGPT1-Daisy")
-GGUF_FILE = Path("PicoGPT1-Daisy.gguf")
+from config import GGUF_FILE as GGUF_NAME, MODEL_DIR as MODEL_DIR_NAME
+
+MODEL_DIR = Path(MODEL_DIR_NAME)
+GGUF_FILE = Path(GGUF_NAME)
 CONVERTER_URL = "https://raw.githubusercontent.com/ggml-org/llama.cpp/b4000/convert_hf_to_gguf.py"
 
 

@@ -1,18 +1,20 @@
-"""Publie PicoGPT1-Daisy (poids Transformers + GGUF) sur Hugging Face.
+"""Publie le modèle courant (poids Transformers + GGUF) sur Hugging Face.
 
 Prérequis : être connecté via `huggingface-cli login` ou avoir HF_TOKEN.
 """
 
 from pathlib import Path
 
+from config import GGUF_FILE as GGUF_NAME, HF_REPO_ID, MODEL_DIR as MODEL_DIR_NAME, MODEL_NAME
+
 import requests
 from huggingface_hub import HfApi, configure_http_backend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-REPO_ID = "nazimboudeffa/PicoGPT1-Daisy"
-MODEL_DIR = Path("PicoGPT1-Daisy")
-GGUF_FILE = Path("PicoGPT1-Daisy.gguf")
+REPO_ID = HF_REPO_ID
+MODEL_DIR = Path(MODEL_DIR_NAME)
+GGUF_FILE = Path(GGUF_NAME)
 MODEL_CARD = Path("MODEL_CARD.md")
 
 
@@ -50,7 +52,7 @@ def main() -> None:
         folder_path=str(MODEL_DIR),
         repo_id=REPO_ID,
         repo_type="model",
-        commit_message="Poids et tokenizer PicoGPT1-Daisy",
+        commit_message=f"Poids et tokenizer {MODEL_NAME}",
         ignore_patterns=["checkpoint-*"],
     )
     api.upload_file(

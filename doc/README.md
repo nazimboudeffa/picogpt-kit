@@ -16,6 +16,7 @@ Cette documentation décrit le dépôt local, l'entraînement, la génération, 
 10. [Dépannage](10-depannage.md)
 11. [Limites et pistes d'amélioration](11-limites.md)
 12. [Ancrage / RAG](12-rag.md)
+13. [Versions et noms de fleurs](13-versions.md)
 
 ## Démarrage rapide
 
@@ -46,4 +47,5 @@ python publish_hf.py
 
 - Dépôt GitHub : https://github.com/nazimboudeffa/picogpt-kit
 - Modèle Hugging Face : https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy
+- Historique des releases : https://github.com/nazimboudeffa/picogpt-kit/blob/main/CHANGELOG.md
 - llama.app : https://llama.app

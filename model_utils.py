@@ -1,5 +1,6 @@
 """Fonctions partagées pour charger le modèle et générer une réponse."""
 
+from config import MODEL_DIR
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -7,7 +8,6 @@ from transformers import (
     StoppingCriteriaList,
 )
 
-MODEL_DIR = "PicoGPT1-Daisy"
 MAX_LEN = 256  # doit rester identique à MAX_LEN dans train.py
 
 DEFAULT_MAX_NEW_TOKENS = 64

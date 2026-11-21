@@ -2,13 +2,14 @@
 
 Usage :
     python evaluate.py
-    python evaluate.py --model-dir PicoGPT1-Daisy
+    python evaluate.py --model-dir chemin/vers/le/modele
 """
 
 import argparse
 import json
 from pathlib import Path
 
+from config import MODEL_DIR
 from model_utils import load_model
 from prepare_rag_dataset import OUT_OF_SCOPE_QUESTIONS
 from rag import (
@@ -24,7 +25,7 @@ KB_PATH = Path("knowledge.jsonl")
 
 def main():
     parser = argparse.ArgumentParser(description="Évalue le pipeline RAG")
-    parser.add_argument("--model-dir", default="PicoGPT1-Daisy")
+    parser.add_argument("--model-dir", default=MODEL_DIR)
     parser.add_argument("--max-new-tokens", type=int, default=32)
     args = parser.parse_args()
 
