@@ -8,7 +8,7 @@ Le projet porte un **codename végétal** qui change à chaque itération : `Jas
 | --- | --- | --- |
 | `0.x` | Jasmine | prototype historique, conservé tel quel |
 | `1.0.0` | Daisy | GPT-2 pré-entraîné, RAG, GGUF, publication HF |
-| `1.1.0` | (à choisir) | données et RAG améliorés, mêmes poids de base |
+| `1.1.0` | Iris | correctif des hallucinations hors base proches, mêmes poids de base |
 | `2.0.0` | (à choisir) | changement d'architecture (ex. LoRA) |
 
 Le **numéro de version** décrit l'évolution technique (semver simplifié) ; le **codename** est le nom lisible de la release. Le nom complet est `PicoGPT<majeure>-<Fleur>`. Le tag git associé est `v<version>-<fleur en minuscules>`, par exemple `v1.0.0-daisy`.

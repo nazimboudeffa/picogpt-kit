@@ -74,6 +74,7 @@ Chaque itération porte un nom de fleur (codename). La convention et la procédu
 | --- | --- | --- |
 | `0.x` | Jasmine | prototype historique, conservé tel quel |
 | `1.0.0` | Daisy | GPT-2 124 M, RAG, GGUF |
+| `1.1.0` | Iris | correctif des hallucinations hors base proches |
 
 Le nom, la version et l'identifiant Hugging Face ne sont définis qu'une seule fois, dans `project.json`. Les scripts les lisent via `config.py`. Pour passer à la fleur suivante :
 
