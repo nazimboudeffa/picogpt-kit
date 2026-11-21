@@ -38,7 +38,7 @@ L'ancien dépôt [`nazimboudeffa/PicoGPT1-Jasmine`](https://huggingface.co/nazim
 | Entraînement | 10 epochs depuis zéro, ~1 250 steps, loss finale ≈ 4,95 | 5 epochs de fine-tuning (2 442 exemples) |
 | GGUF | Ancien export | Régénéré depuis les nouveaux poids |
 
-En résumé : **modèle plus grand issu de GPT-2 pré-entraîné, données nettoyées, décodage corrigé et ancrage anti-hallucination** côté Python. Le passage à GPT-2 pré-entraîné améliore la cohérence des réponses en génération libre, y compris dans le GGUF. Le code source et la documentation détaillée sont dans <https://github.com/nazimboudeffa/picogpt1-daisy>.
+En résumé : **modèle plus grand issu de GPT-2 pré-entraîné, données nettoyées, décodage corrigé et ancrage anti-hallucination** côté Python. Le passage à GPT-2 pré-entraîné améliore la cohérence des réponses en génération libre, y compris dans le GGUF. Le code source et la documentation détaillée sont dans <https://github.com/nazimboudeffa/picogpt-kit>.
 
 ## Utiliser avec llama.app / llama.cpp
 

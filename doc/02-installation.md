@@ -9,8 +9,8 @@
 ## Cloner le dépôt
 
 ```bash
-git clone https://github.com/nazimboudeffa/picogpt1-daisy.git
-cd picogpt1-daisy
+git clone https://github.com/nazimboudeffa/picogpt-kit.git
+cd picogpt-kit
 ```
 
 ## Dépendances Python

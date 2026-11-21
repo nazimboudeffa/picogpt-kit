@@ -44,6 +44,6 @@ python publish_hf.py
 
 ## Liens
 
-- Dépôt GitHub : https://github.com/nazimboudeffa/picogpt1-daisy
+- Dépôt GitHub : https://github.com/nazimboudeffa/picogpt-kit
 - Modèle Hugging Face : https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy
 - llama.app : https://llama.app

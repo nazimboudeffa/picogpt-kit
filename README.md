@@ -142,8 +142,8 @@ Optionnels :
 ### 4.1 Cloner le dépôt
 
 ```bash
-git clone https://github.com/nazimboudeffa/picogpt1-daisy.git
-cd picogpt1-daisy
+git clone https://github.com/nazimboudeffa/picogpt-kit.git
+cd picogpt-kit
 ```
 
 ### 4.2 Créer un environnement virtuel (recommandé)
@@ -782,7 +782,7 @@ Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md).
 
 ## 16. Liens et références
 
-- Dépôt GitHub : <https://github.com/nazimboudeffa/picogpt1-daisy>
+- Dépôt GitHub : <https://github.com/nazimboudeffa/picogpt-kit>
 - Modèle Hugging Face : <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>
 - Dataset : <https://huggingface.co/datasets/tatsu-lab/alpaca>
 - Documentation détaillée : [doc/README.md](doc/README.md)
