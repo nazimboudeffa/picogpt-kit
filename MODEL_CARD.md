@@ -1,7 +1,7 @@
 ---
 library_name: transformers
-version: 1.0.0
-codename: daisy
+version: 1.1.0
+codename: iris
 tags:
   - gpt2
   - gguf
@@ -14,9 +14,9 @@ tags:
   - abstention
 ---
 
-# PicoGPT1-Daisy
+# PicoGPT1-Iris
 
-> Release `1.0.0` — codename Daisy. Les versions et les noms de fleurs sont décrits dans le dépôt source (`CHANGELOG.md`).
+> Release `1.0.0` — codename Iris. Les versions et les noms de fleurs sont décrits dans le dépôt source (`CHANGELOG.md`).
 
 GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, 245 exemples d'ancrage et 197 questions/réponses directes issus d'une base fermée de 30 faits (2 442 exemples au total).
 
@@ -24,7 +24,7 @@ GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées,
 - Contexte : 1 024 positions dans le modèle, exemples tronqués à 256 tokens
 - Tokenizer : GPT-2 (50 257 tokens)
 - Format appris : `prompt\nreponse<|endoftext|>`
-- Fichiers : poids Transformers (`model.safetensors`) et variante `PicoGPT1-Daisy.gguf`
+- Fichiers : poids Transformers (`model.safetensors`) et variante `PicoGPT1-Iris.gguf`
 
 > Modèle expérimental : les réponses en génération libre peuvent être approximatives. Pour des faits vérifiés, utilisez l'ancrage décrit ci-dessous (scripts Python uniquement).
 
@@ -32,7 +32,7 @@ GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées,
 
 L'ancien dépôt [`nazimboudeffa/PicoGPT1-Jasmine`](https://huggingface.co/nazimboudeffa/PicoGPT1-Jasmine) est conservé tel quel comme référence historique. Celui-ci est une **nouvelle version**, avec un modèle plus grand issu d'un fine-tuning de GPT-2.
 
-| Élément | `PicoGPT1-Jasmine` (ancien) | `PicoGPT1-Daisy` (ce dépôt) |
+| Élément | `PicoGPT1-Jasmine` (ancien) | `PicoGPT1-Iris` (ce dépôt) |
 | --- | --- | --- |
 | Architecture | GPT-2 : 2 couches, 128 dims, 2 têtes, contexte 256 | **GPT-2 complet** : 12 couches, 768 dims, 12 têtes (124 M paramètres) |
 | Jeu d'entraînement | 500 exemples Alpaca bruts | 2 000 Alpaca **filtrés** + 245 ancrages + 197 Q/R directes = **2 442 exemples** |
@@ -49,13 +49,13 @@ En résumé : **modèle plus grand issu de GPT-2 pré-entraîné, données netto
 Le CLI fourni par [llama.app](https://llama.app) télécharge le GGUF depuis ce dépôt :
 
 ```bash
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama cli -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 ```
 
 Pour ouvrir l'interface web de chat :
 
 ```bash
-llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama serve -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 # puis http://localhost:9931
 ```
 
@@ -64,7 +64,7 @@ llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "nazimboudeffa/PicoGPT1-Daisy"
+model_id = "nazimboudeffa/PicoGPT1-Iris"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
 

@@ -1,6 +1,6 @@
 # 10. Dépannage
 
-## `Poids introuvables dans 'PicoGPT1-Daisy'`
+## `Poids introuvables dans 'PicoGPT1-Iris'`
 
 Les poids ne sont pas versionnés. Lancez :
 
@@ -38,7 +38,7 @@ Vérifiez que le GGUF a été régénéré après le dernier entraînement et qu
 
 ```bash
 python export_gguf.py
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama cli -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 ```
 
 ## Les réponses sont incohérentes

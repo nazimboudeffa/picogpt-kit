@@ -95,7 +95,7 @@ Dans `train.py` :
 | `DATA_PATHS` | `[train.txt, rag_train.txt, facts_train.txt]` | Fichiers lus à l'entraînement |
 | `MAX_EXAMPLES` / `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 
-L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total utilisé pour le dernier entraînement est de 2 442 exemples (2 000 + 245 + 197), sous la limite de 3 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Daisy/` quand il y est, sinon depuis le modèle de départ (évite une requête réseau TLS).
+L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total utilisé pour le dernier entraînement est de 2 442 exemples (2 000 + 245 + 197), sous la limite de 3 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Iris/` quand il y est, sinon depuis le modèle de départ (évite une requête réseau TLS).
 
 ## Dataset personnalisé
 

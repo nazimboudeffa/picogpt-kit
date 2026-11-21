@@ -47,7 +47,7 @@ python prepare_rag_dataset.py   # rag_train.txt : exemples ancrés + abstention
 python train.py                 # DATA_PATHS = [train.txt, rag_train.txt]
 ```
 
-`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` et `MAX_EXAMPLES = 3000`. Le dernier entraînement porte sur **2 442 exemples** (2 000 Alpaca + 245 ancrés + 197 réponses directes issues de `facts_train.txt`), en fine-tuning de GPT-2 sur 5 epochs. Le tokenizer est pris dans `PicoGPT1-Daisy/` s'il y est, sinon depuis le modèle de départ : cela évite une requête réseau TLS et garantit le même vocabulaire.
+`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` et `MAX_EXAMPLES = 3000`. Le dernier entraînement porte sur **2 442 exemples** (2 000 Alpaca + 245 ancrés + 197 réponses directes issues de `facts_train.txt`), en fine-tuning de GPT-2 sur 5 epochs. Le tokenizer est pris dans `PicoGPT1-Iris/` s'il y est, sinon depuis le modèle de départ : cela évite une requête réseau TLS et garantit le même vocabulaire.
 
 Génération et évaluation :
 

@@ -11,9 +11,9 @@ Le projet porte un **codename végétal** qui change à chaque itération : `Jas
 | `1.1.0` | Iris | correctif des hallucinations hors base proches, mêmes poids de base |
 | `2.0.0` | (à choisir) | changement d'architecture (ex. LoRA) |
 
-Le **numéro de version** décrit l'évolution technique (semver simplifié) ; le **codename** est le nom lisible de la release. Le nom complet est `PicoGPT<majeure>-<Fleur>`. Le tag git associé est `v<version>-<fleur en minuscules>`, par exemple `v1.0.0-daisy`.
+Le **numéro de version** décrit l'évolution technique (semver simplifié) ; le **codename** est le nom lisible de la release. Le nom complet est `PicoGPT<majeure>-<Fleur>`. Le tag git associé est `v<version>-<fleur en minuscules>`, par exemple `v1.1.0-iris`.
 
-Règle recommandée : un nouveau codename à chaque publication, un nouveau dépôt Hugging Face par codename (comme `PicoGPT1-Jasmine` et `PicoGPT1-Daisy`), et un tag git sur le commit de release. Ainsi, une régression peut toujours être identifiée et reproductible.
+Règle recommandée : un nouveau codename à chaque publication, un nouveau dépôt Hugging Face par codename (comme `PicoGPT1-Jasmine` et `PicoGPT1-Iris`), et un tag git sur le commit de release. Ainsi, une régression peut toujours être identifiée et reproductible.
 
 ## Source de vérité
 
@@ -22,8 +22,8 @@ Le fichier [`project.json`](../project.json) contient toutes les données de rel
 ```json
 {
   "family": "PicoGPT1",
-  "version": "1.0.0",
-  "codename": "Daisy",
+  "version": "1.1.0",
+  "codename": "Iris",
   "hf_owner": "nazimboudeffa"
 }
 ```
@@ -32,17 +32,17 @@ Le module [`config.py`](../config.py) lit ce fichier et expose les constantes ut
 
 | Constante | Valeur pour la release actuelle | Utilisée par |
 | --- | --- | --- |
-| `MODEL_NAME` | `PicoGPT1-Daisy` | `train.py`, `test.py`, `publish_hf.py` |
-| `MODEL_DIR` | `PicoGPT1-Daisy` | `model_utils.py`, `train.py`, `export_gguf.py`, `publish_hf.py` |
-| `GGUF_FILE` | `PicoGPT1-Daisy.gguf` | `export_gguf.py`, `publish_hf.py` |
-| `HF_REPO_ID` | `nazimboudeffa/PicoGPT1-Daisy` | `publish_hf.py` |
-| `RELEASE_TAG` | `v1.0.0-daisy` | suggestion du script de renommage |
+| `MODEL_NAME` | `PicoGPT1-Iris` | `train.py`, `test.py`, `publish_hf.py` |
+| `MODEL_DIR` | `PicoGPT1-Iris` | `model_utils.py`, `train.py`, `export_gguf.py`, `publish_hf.py` |
+| `GGUF_FILE` | `PicoGPT1-Iris.gguf` | `export_gguf.py`, `publish_hf.py` |
+| `HF_REPO_ID` | `nazimboudeffa/PicoGPT1-Iris` | `publish_hf.py` |
+| `RELEASE_TAG` | `v1.1.0-iris` | suggestion du script de renommage |
 
 Vérification rapide :
 
 ```bash
 python config.py
-# PicoGPT1-Daisy — v1.0.0 (v1.0.0-daisy) — nazimboudeffa/PicoGPT1-Daisy
+# PicoGPT1-Iris — v1.0.0 (v1.1.0-iris) — nazimboudeffa/PicoGPT1-Iris
 ```
 
 Aucun script Python ne code plus le nom de la fleur en dur : changer `project.json` suffit à rediriger entraînement, génération, export et publication.
@@ -64,7 +64,7 @@ Il :
 1. met à jour `project.json` ;
 2. remplace l'ancien nom dans les fichiers texte (README, MODEL_CARD, `doc/`) ;
 3. insère une entrée datée dans [`CHANGELOG.md`](../CHANGELOG.md) ;
-4. renomme le dossier de poids `PicoGPT1-Daisy/` et le fichier `PicoGPT1-Daisy.gguf` s'ils existent ;
+4. renomme le dossier de poids `PicoGPT1-Iris/` et le fichier `PicoGPT1-Iris.gguf` s'ils existent ;
 5. affiche les commandes de vérification, de publication et le tag git suggéré.
 
 Options utiles :

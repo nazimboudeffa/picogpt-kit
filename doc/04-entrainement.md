@@ -26,7 +26,7 @@ Les options `--n-layer`, `--n-embd` et `--n-head` ne sont utilisées qu'avec `--
 | Option | Défaut | Description |
 | --- | --- | --- |
 | `--data-paths` | `train.txt rag_train.txt facts_train.txt` | Fichiers d'exemples (un fichier absent est ignoré) |
-| `--output-dir` | `PicoGPT1-Daisy` | Dossier de sauvegarde |
+| `--output-dir` | `PicoGPT1-Iris` | Dossier de sauvegarde |
 | `--max-len` | `256` | Longueur maximale du contexte |
 | `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 | `--epochs` | `3` en fine-tuning, `10` depuis zéro | Nombre d'epochs |
@@ -52,7 +52,7 @@ Les options `--n-layer`, `--n-embd` et `--n-head` ne sont utilisées qu'avec `--
 
 ## Sorties
 
-Fichiers générés dans `PicoGPT1-Daisy/` :
+Fichiers générés dans `PicoGPT1-Iris/` :
 
 - `config.json`
 - `generation_config.json`

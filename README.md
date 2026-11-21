@@ -1,8 +1,8 @@
-# PicoGPT1-Daisy
+# PicoGPT1-Iris
 
 **Un mini GPT-2 entraîné de zéro, du dataset jusqu'au chat dans le navigateur.**
 
-`PicoGPT1-Daisy` est un projet pédagogique qui montre le cycle complet d'un petit modèle de langage : préparation d'un jeu de données d'instructions, entraînement d'un GPT-2 minuscule en Python, génération en ligne de commande ou via un serveur HTTP local, export au format GGUF, publication sur Hugging Face et test avec [llama.app](https://llama.app).
+`PicoGPT1-Iris` est un projet pédagogique qui montre le cycle complet d'un petit modèle de langage : préparation d'un jeu de données d'instructions, entraînement d'un GPT-2 minuscule en Python, génération en ligne de commande ou via un serveur HTTP local, export au format GGUF, publication sur Hugging Face et test avec [llama.app](https://llama.app).
 
 Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisent directement les poids Transformers. Le format GGUF n'est produit que pour une utilisation optionnelle avec llama.cpp / llama.app.
 
@@ -41,7 +41,7 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Connaissances | `knowledge.jsonl` | Base fermée de 30 faits en français (versionnée) |
 | Données ancrées | `prepare_rag_dataset.py` | `rag_train.txt` (245 exemples, ignoré par Git) |
 | Réponses directes | `prepare_facts_dataset.py` | `facts_train.txt` (197 exemples, ignoré par Git) |
-| Entraînement | `train.py` | Poids Transformers dans `PicoGPT1-Daisy/` |
+| Entraînement | `train.py` | Poids Transformers dans `PicoGPT1-Iris/` |
 | Ancrage | `rag.py` | Réponse extraite du contexte ou `Je ne sais pas.` |
 | Évaluation | `evaluate.py` | Exactitude, ancrage, abstentions, retrieval ; rapport `reports/<codename>-<split>.json` |
 | Jeu de test | `eval/test.jsonl` | 40 questions jamais vues (30 reformulations + 10 hors base) |
@@ -49,7 +49,7 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Comparaison | `compare_reports.py` | Tableau des métriques par codename |
 | Test CLI | `test.py` | Affichage d'une réponse générée (avec ou sans `--rag`) |
 | API locale | `serve.py` | `POST /generate` sur `http://127.0.0.1:8000` |
-| Export | `export_gguf.py` | `PicoGPT1-Daisy.gguf` (~328 Mo, F16) |
+| Export | `export_gguf.py` | `PicoGPT1-Iris.gguf` (~328 Mo, F16) |
 | Publication | `publish_hf.py` | Dépôt Hugging Face public |
 
 ### État actuel
@@ -61,8 +61,8 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Base de connaissances | `knowledge.jsonl` : 30 faits en français, versionnée |
 | Évaluation RAG (jeu train) | 30/30 réponses exactes, 30/30 ancrées, 0 abstention à tort, 10/10 abstentions hors base |
 | Benchmark figé (jeu test) | 28/30 exactes, 30/30 retrieval, 5/5 abstentions hors base éloignées, 1/5 hors base proches (`reports/daisy-test.json`) |
-| Poids locaux | `PicoGPT1-Daisy/model.safetensors` (**non versionné**) |
-| Modèle publié | [nazimboudeffa/PicoGPT1-Daisy](https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy) |
+| Poids locaux | `PicoGPT1-Iris/model.safetensors` (**non versionné**) |
+| Modèle publié | [nazimboudeffa/PicoGPT1-Iris](https://huggingface.co/nazimboudeffa/PicoGPT1-Iris) |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Versions utilisées | Python 3.13 / Windows 11, `transformers` 4.52.4, `huggingface_hub` 0.33.0, `torch` CPU |
 
@@ -93,7 +93,7 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 
 ```
 .
-├── PicoGPT1-Daisy/          # modèle entraîné (config, tokenizer, poids)
+├── PicoGPT1-Iris/          # modèle entraîné (config, tokenizer, poids)
 │   ├── config.json
 │   ├── generation_config.json
 │   ├── merges.txt
@@ -126,7 +126,7 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 ├── train.txt                  # dataset généré, ignoré par Git
 ├── rag_train.txt              # dataset ancré généré, ignoré par Git
 ├── facts_train.txt            # Q/R directes générées, ignoré par Git
-├── PicoGPT1-Daisy.gguf        # export GGUF, ignoré par Git
+├── PicoGPT1-Iris.gguf        # export GGUF, ignoré par Git
 ├── MODEL_CARD.md              # fiche modèle publiée sur le Hub
 └── README.md                  # ce fichier
 ```
@@ -142,7 +142,7 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 | `prepare_dataset.py` | Télécharge un sous-ensemble de `tatsu-lab/alpaca`, filtre les exemples invalides et écrit `train.txt` |
 | `prepare_rag_dataset.py` | Génère `rag_train.txt` depuis `knowledge.jsonl` (à lancer après `prepare_dataset.py`) |
 | `prepare_facts_dataset.py` | Génère `facts_train.txt` : questions/réponses directes et variantes, pour llama.app |
-| `train.py` | Ajuste GPT-2 sur les trois fichiers, sauvegarde dans `PicoGPT1-Daisy/` |
+| `train.py` | Ajuste GPT-2 sur les trois fichiers, sauvegarde dans `PicoGPT1-Iris/` |
 | `rag.py` | TF-IDF sur `knowledge.jsonl`, vérification d'ancrage et abstention |
 | `evaluate.py` | Mesure exactitude, ancrage, abstentions et retrieval ; `--split test` utilise le jeu figé et écrit un rapport |
 | `model_utils.py` | `load_model()` et `generate()`, utilisés par `test.py`, `serve.py` et `rag.py` |
@@ -376,7 +376,7 @@ L'entraînement est piloté par des options CLI (`python train.py --help`). Les 
 | Option | Défaut | Description |
 | --- | --- | --- |
 | `--data-paths` | `train.txt rag_train.txt` | Fichiers d'exemples (remplace l'ancien `DATA_PATH`) |
-| `--output-dir` | `PicoGPT1-Daisy` | Dossier de sauvegarde |
+| `--output-dir` | `PicoGPT1-Iris` | Dossier de sauvegarde |
 | `--max-len` | `256` | Longueur maximale du contexte |
 | `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 | `--epochs` | `3` (`10` avec `--init scratch`) | Nombre d'epochs |
@@ -392,19 +392,19 @@ L'entraînement est piloté par des options CLI (`python train.py --help`). Les 
 
 ### Ce que fait le script
 
-1. Charge le tokenizer depuis `PicoGPT1-Daisy/` s'il y est (même vocabulaire, pas de requête réseau TLS), sinon depuis le modèle de départ. Il utilise `<|endoftext|>` comme token EOS et PAD.
+1. Charge le tokenizer depuis `PicoGPT1-Iris/` s'il y est (même vocabulaire, pas de requête réseau TLS), sinon depuis le modèle de départ. Il utilise `<|endoftext|>` comme token EOS et PAD.
 2. Définit un `chat_template` correspondant au format appris `prompt\nreponse<|endoftext|>`.
 3. Lit successivement `train.txt` et `rag_train.txt` et tokenise chaque exemple (tronqué à 256 tokens).
 4. Masque les tokens du prompt dans les labels (`-100`) : la loss ne porte que sur la réponse.
 5. Charge GPT-2 pré-entraîné (124 M paramètres) ou construit un modèle plus petit avec `--init scratch`.
 6. Entraîne avec le `Trainer` de Transformers (`logging_steps=50`, `save_steps` configurable).
-7. Sauvegarde le modèle et le tokenizer dans `PicoGPT1-Daisy/`.
+7. Sauvegarde le modèle et le tokenizer dans `PicoGPT1-Iris/`.
 
 ### Durée et sorties
 
 Dernier entraînement : **4 min 11 sur RTX 3070** (CUDA + `--fp16`), 5 epochs (≈ 3 050 steps), loss moyenne 1,58 et dernière loss journalisée ≈ 1,05. Sur CPU, la même configuration prendrait nettement plus longtemps. Le fine-tuning part de poids pré-entraînés : la loss est bien plus basse qu'avec un modèle entraîné de zéro (≈ 4,54 auparavant).
 
-Fichiers générés dans `PicoGPT1-Daisy/` : `config.json`, `generation_config.json`, `model.safetensors`, `merges.txt`, `vocab.json`, `tokenizer.json`, `special_tokens_map.json`, `tokenizer_config.json`.
+Fichiers générés dans `PicoGPT1-Iris/` : `config.json`, `generation_config.json`, `model.safetensors`, `merges.txt`, `vocab.json`, `tokenizer.json`, `special_tokens_map.json`, `tokenizer_config.json`.
 
 Un dossier de checkpoint peut apparaître : il est ignoré par Git et peut être supprimé sans risque, les poids finaux sont dans `model.safetensors`. Après un réentraînement, pensez à régénérer le GGUF (section 10).
 
@@ -426,7 +426,7 @@ python test.py --prompt "Explique la psychanalyse.\n" --do-sample
 
 | Option | Défaut | Description |
 | --- | --- | --- |
-| `--model-dir` | `PicoGPT1-Daisy` | Dossier du modèle entraîné |
+| `--model-dir` | `PicoGPT1-Iris` | Dossier du modèle entraîné |
 | `--prompt` | `What is the capital of France?\n` | Texte à compléter |
 | `--max-new-tokens` | `64` | Nombre maximum de tokens générés |
 | `--do-sample` | activé | Échantillonnage (défaut, évite les boucles) |
@@ -474,7 +474,7 @@ Toute la logique est dans `model_utils.py` :
 ```python
 from model_utils import load_model, generate
 
-tokenizer, model = load_model("PicoGPT1-Daisy")
+tokenizer, model = load_model("PicoGPT1-Iris")
 print(generate(tokenizer, model, "What is 2+2?\n", do_sample=True))
 ```
 
@@ -483,7 +483,7 @@ print(generate(tokenizer, model, "What is 2+2?\n", do_sample=True))
 Si les poids sont absents, le message suivant s'affiche :
 
 ```
-Poids introuvables dans 'PicoGPT1-Daisy'. Lancez d'abord `python train.py`.
+Poids introuvables dans 'PicoGPT1-Iris'. Lancez d'abord `python train.py`.
 ```
 
 ---
@@ -578,14 +578,14 @@ print(r.json()["generated_text"])
 ### Options CLI
 
 ```bash
-python serve.py --host 127.0.0.1 --port 9000 --model-dir PicoGPT1-Daisy
+python serve.py --host 127.0.0.1 --port 9000 --model-dir PicoGPT1-Iris
 ```
 
 | Option | Défaut | Description |
 | --- | --- | --- |
 | `--host` | `127.0.0.1` | Adresse d'écoute |
 | `--port` | `8000` | Port d'écoute |
-| `--model-dir` | `PicoGPT1-Daisy` | Dossier du modèle |
+| `--model-dir` | `PicoGPT1-Iris` | Dossier du modèle |
 
 Arrêtez le serveur avec `Ctrl+C`.
 
@@ -599,7 +599,7 @@ Les scripts Python utilisent `model.safetensors`. llama.cpp / llama.app attenden
 python export_gguf.py
 ```
 
-Prérequis : `PicoGPT1-Daisy/model.safetensors` doit exister (`python train.py`).
+Prérequis : `PicoGPT1-Iris/model.safetensors` doit exister (`python train.py`).
 
 ### Fonctionnement
 
@@ -608,12 +608,12 @@ Prérequis : `PicoGPT1-Daisy/model.safetensors` doit exister (`python train.py`)
 3. Lance la conversion avec `--outtype f16`.
 4. Supprime les fichiers temporaires.
 
-Résultat : `PicoGPT1-Daisy.gguf` (~328 Mo, 149 tenseurs, F16), ignoré par Git. Le `chat_template` présent dans `tokenizer_config.json` est conservé dans le GGUF.
+Résultat : `PicoGPT1-Iris.gguf` (~328 Mo, 149 tenseurs, F16), ignoré par Git. Le `chat_template` présent dans `tokenizer_config.json` est conservé dans le GGUF.
 
 ### Vérification locale
 
 ```bash
-llama cli -m PicoGPT1-Daisy.gguf -st -p "What is 2+2?" -n 20
+llama cli -m PicoGPT1-Iris.gguf -st -p "What is 2+2?" -n 20
 ```
 
 Après chaque réentraînement, relancez l'export puis la publication pour garder poids Transformers et GGUF synchronisés :
@@ -631,7 +631,7 @@ Les exemples `rag_train.txt` et `facts_train.txt` font désormais partie de l'en
 
 ## 11. Publier sur Hugging Face
 
-Le modèle est publié publiquement ici : **[nazimboudeffa/PicoGPT1-Daisy](https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy)**.
+Le modèle est publié publiquement ici : **[nazimboudeffa/PicoGPT1-Iris](https://huggingface.co/nazimboudeffa/PicoGPT1-Iris)**.
 
 ### Prérequis
 
@@ -649,9 +649,9 @@ python publish_hf.py
 Le script :
 
 1. Crée le dépôt s'il n'existe pas (`private=False`, `exist_ok=True`).
-2. Upload le contenu de `PicoGPT1-Daisy/` en ignorant `checkpoint-*`.
+2. Upload le contenu de `PicoGPT1-Iris/` en ignorant `checkpoint-*`.
 3. Upload `MODEL_CARD.md` comme `README.md` du dépôt Hub.
-4. Upload `PicoGPT1-Daisy.gguf`.
+4. Upload `PicoGPT1-Iris.gguf`.
 
 Une session HTTP avec retries est configurée pour absorber les erreurs TLS intermittentes de certains réseaux. En cas d'échec, relancez simplement la commande.
 
@@ -662,19 +662,19 @@ Une session HTTP avec retries est configurée pour absorber les erreurs TLS inte
 ### Avec le CLI llama.app
 
 ```bash
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama cli -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 ```
 
 `-hff` force le fichier GGUF à utiliser. Comme le dépôt ne contient qu'un seul GGUF, la forme courte fonctionne aussi :
 
 ```bash
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy
+llama cli -hf nazimboudeffa/PicoGPT1-Iris
 ```
 
 ### Interface web de chat
 
 ```bash
-llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama serve -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 # puis ouvrir http://localhost:9931
 ```
 
@@ -693,7 +693,7 @@ llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "nazimboudeffa/PicoGPT1-Daisy"
+model_id = "nazimboudeffa/PicoGPT1-Iris"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
 
@@ -705,7 +705,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 
 ### Avec le serveur local
 
-Si vous avez entraîné vos propres poids, `python serve.py` expose directement `PicoGPT1-Daisy/`. Pour un autre dossier :
+Si vous avez entraîné vos propres poids, `python serve.py` expose directement `PicoGPT1-Iris/`. Pour un autre dossier :
 
 ```bash
 python serve.py --model-dir chemin/vers/mon/modele --port 9000
@@ -715,7 +715,7 @@ python serve.py --model-dir chemin/vers/mon/modele --port 9000
 
 ## 13. Architecture du modèle
 
-Configuration héritée du modèle pré-entraîné (mode par défaut) et sauvegardée dans `PicoGPT1-Daisy/config.json` :
+Configuration héritée du modèle pré-entraîné (mode par défaut) et sauvegardée dans `PicoGPT1-Iris/config.json` :
 
 | Paramètre | Valeur |
 | --- | --- |
@@ -770,7 +770,7 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 
 | Symptôme | Solution |
 | --- | --- |
-| `Poids introuvables dans 'PicoGPT1-Daisy'` | Les poids ne sont pas versionnés : lancez `python train.py` (puis `python export_gguf.py` pour le GGUF). |
+| `Poids introuvables dans 'PicoGPT1-Iris'` | Les poids ne sont pas versionnés : lancez `python train.py` (puis `python export_gguf.py` pour le GGUF). |
 | `Token is required ... no token found` | Connectez-vous avec `huggingface-cli login` ou définissez `HF_TOKEN`. |
 | Erreur SSL pendant la publication | Les retries sont déjà configurés ; relancez `python publish_hf.py`. |
 | Le modèle ne génère rien avec llama.cpp | Régénérez le GGUF après le dernier entraînement : `python export_gguf.py`, puis testez avec `llama cli ...`. |
@@ -820,7 +820,7 @@ Résultats détaillés dans [doc/12-rag.md](doc/12-rag.md) et [doc/14-benchmark.
 ## 16. Liens et références
 
 - Dépôt GitHub : <https://github.com/nazimboudeffa/picogpt-kit>
-- Modèle Hugging Face : <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>
+- Modèle Hugging Face : <https://huggingface.co/nazimboudeffa/PicoGPT1-Iris>
 - Dataset : <https://huggingface.co/datasets/tatsu-lab/alpaca>
 - Documentation détaillée : [doc/README.md](doc/README.md)
 - Pipeline RAG / ancrage : [doc/12-rag.md](doc/12-rag.md)

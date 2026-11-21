@@ -10,7 +10,13 @@ Format d'une release : `PicoGPT<majeure>-<Fleur>`, avec un tag git `v<version>-<
 - Ajout : `evaluate.py --split test` écrit un rapport par codename dans `reports/`, avec empreinte du jeu, commit et détails des réponses.
 - Ajout : `compare_reports.py` et [doc/14-benchmark.md](doc/14-benchmark.md).
 - Mesure de référence sur Daisy : 28/30 réponses exactes sur le jeu test (contre 30/30 sur le jeu train), 30/30 retrieval, 5/5 abstentions hors base éloignées, 1/5 hors base proches. Voir `reports/daisy-test.json`.
-- Codename retenu pour la release suivante : `Iris` (`1.1.0`), avec pour objectif de corriger les hallucinations sur les questions hors base proches.
+
+## [1.1.0] — Iris — 2026-11-21
+
+Changement de codename : `PicoGPT1-Daisy` → `PicoGPT1-Iris`.
+
+- Ajout : 90 exemples négatifs générés par `prepare_negative_dataset.py` (questions même domaine mais entité absente de la base) pour apprendre à refuser le contexte retrieved à tort.
+- Réglage : `DEFAULT_MIN_SCORE` passe de 0,50 à 0,40 ; deux reformulations couvertes étaient refusées juste sous l'ancien seuil.
 
 ## [1.0.0] — Daisy — 2026-11-21
 

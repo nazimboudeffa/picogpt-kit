@@ -1,4 +1,4 @@
-# Documentation — PicoGPT1-Daisy
+# Documentation — PicoGPT1-Iris
 
 Cette documentation décrit le dépôt local, l'entraînement, la génération, le serveur HTTP, l'export GGUF, la publication sur Hugging Face et le pipeline d'ancrage (RAG).
 
@@ -50,6 +50,6 @@ python publish_hf.py
 ## Liens
 
 - Dépôt GitHub : https://github.com/nazimboudeffa/picogpt-kit
-- Modèle Hugging Face : https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy
+- Modèle Hugging Face : https://huggingface.co/nazimboudeffa/PicoGPT1-Iris
 - Historique des releases : https://github.com/nazimboudeffa/picogpt-kit/blob/main/CHANGELOG.md
 - llama.app : https://llama.app

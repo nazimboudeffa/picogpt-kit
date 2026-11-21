@@ -2,7 +2,7 @@
 
 ## Configuration
 
-Héritée de GPT-2 pré-entraîné (mode `--init pretrained`, défaut) et sauvegardée dans `PicoGPT1-Daisy/config.json` :
+Héritée de GPT-2 pré-entraîné (mode `--init pretrained`, défaut) et sauvegardée dans `PicoGPT1-Iris/config.json` :
 
 | Paramètre | Valeur |
 | --- | --- |

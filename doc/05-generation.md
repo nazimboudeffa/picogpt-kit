@@ -22,7 +22,7 @@ python test.py --prompt "Explique la psychanalyse.\n" --do-sample
 
 | Option | Défaut | Description |
 | --- | --- | --- |
-| `--model-dir` | `PicoGPT1-Daisy` | Dossier du modèle |
+| `--model-dir` | `PicoGPT1-Iris` | Dossier du modèle |
 | `--prompt` | `What is the capital of France?\n` | Texte à compléter |
 | `--max-new-tokens` | `64` | Nombre maximum de tokens générés |
 | `--do-sample` | activé | Échantillonnage (défaut, évite les boucles) |
@@ -73,7 +73,7 @@ Le réglage du seuil et les métriques sont détaillés dans [12-rag.md](12-rag.
 Erreur attendue si les poids sont absents :
 
 ```
-Poids introuvables dans 'PicoGPT1-Daisy'. Lancez d'abord `python train.py`.
+Poids introuvables dans 'PicoGPT1-Iris'. Lancez d'abord `python train.py`.
 ```
 
 ## Conseil sur le prompt

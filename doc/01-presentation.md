@@ -2,7 +2,7 @@
 
 ## Objectif
 
-`PicoGPT1-Daisy` est un mini modèle GPT-2 entraîné à partir de zéro sur un petit jeu d'instructions/réponses. Le projet privilégie des **scripts Python directs** : aucun notebook n'est nécessaire pour entraîner ou tester le modèle.
+`PicoGPT1-Iris` est un mini modèle GPT-2 entraîné à partir de zéro sur un petit jeu d'instructions/réponses. Le projet privilégie des **scripts Python directs** : aucun notebook n'est nécessaire pour entraîner ou tester le modèle.
 
 Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF est toutefois exportée pour permettre de tester avec [llama.app](https://llama.app).
 
@@ -11,8 +11,8 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 | Élément | État |
 | --- | --- |
 | Entraînement | Fine-tuning GPT-2 sur 2 442 exemples, 5 epochs |
-| Poids locaux | `PicoGPT1-Daisy/model.safetensors` (non versionné) |
-| Publication | https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy |
+| Poids locaux | `PicoGPT1-Iris/model.safetensors` (non versionné) |
+| Publication | https://huggingface.co/nazimboudeffa/PicoGPT1-Iris |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Branche Git locale | `main` |
 
@@ -22,7 +22,7 @@ Les scripts locaux n'utilisent **ni llama.cpp, ni Ollama**. Une variante GGUF es
 
 ```
 .
-├── PicoGPT1-Daisy/        # modèle entraîné (configs + tokenizer + poids)
+├── PicoGPT1-Iris/        # modèle entraîné (configs + tokenizer + poids)
 │   ├── config.json
 │   ├── generation_config.json
 │   ├── merges.txt

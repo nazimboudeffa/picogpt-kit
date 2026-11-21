@@ -73,4 +73,4 @@ llama --version
 Les poids (`model.safetensors`) et le GGUF sont ignorés par Git. Deux options :
 
 1. Entraîner le modèle localement : `python train.py`
-2. Télécharger le modèle publié : `llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf`
+2. Télécharger le modèle publié : `llama cli -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf`

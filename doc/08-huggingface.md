@@ -2,12 +2,12 @@
 
 ## Dépôt publié
 
-https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy
+https://huggingface.co/nazimboudeffa/PicoGPT1-Iris
 
 Le dépôt est public et contient :
 
 - les poids Transformers et le tokenizer ;
-- `PicoGPT1-Daisy.gguf` ;
+- `PicoGPT1-Iris.gguf` ;
 - le `README.md` (fiche modèle) généré depuis `MODEL_CARD.md`.
 
 Hugging Face reconnaît automatiquement les tags `gguf`, `llama.cpp`, `llama.app` et affiche les commandes correspondantes dans « Use this model ».
@@ -24,28 +24,28 @@ python publish_hf.py
 `publish_hf.py` :
 
 1. Crée le dépôt s'il n'existe pas (`private=False`, `exist_ok=True`).
-2. Upload le contenu de `PicoGPT1-Daisy/` en ignorant `checkpoint-*`.
+2. Upload le contenu de `PicoGPT1-Iris/` en ignorant `checkpoint-*`.
 3. Upload `MODEL_CARD.md` comme `README.md`.
-4. Upload `PicoGPT1-Daisy.gguf`.
+4. Upload `PicoGPT1-Iris.gguf`.
 
 Le script configure une session HTTP avec retries pour absorber les erreurs TLS intermittentes observées sur certains réseaux.
 
 ## Tester avec le CLI llama.app
 
 ```bash
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama cli -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 ```
 
 `-hff` force le fichier GGUF à utiliser. Comme le dépôt ne contient qu'un seul GGUF, la forme courte fonctionne aussi :
 
 ```bash
-llama cli -hf nazimboudeffa/PicoGPT1-Daisy
+llama cli -hf nazimboudeffa/PicoGPT1-Iris
 ```
 
 ## Interface web de chat
 
 ```bash
-llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
+llama serve -hf nazimboudeffa/PicoGPT1-Iris -hff PicoGPT1-Iris.gguf
 # http://localhost:9931
 ```
 
@@ -73,7 +73,7 @@ Plusieurs faits peuvent être placés dans le `Contexte:`, séparés par des esp
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "nazimboudeffa/PicoGPT1-Daisy"
+model_id = "nazimboudeffa/PicoGPT1-Iris"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
 

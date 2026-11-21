@@ -97,13 +97,13 @@ curl -X POST http://127.0.0.1:8000/generate \
 ## Options CLI
 
 ```bash
-python serve.py --host 127.0.0.1 --port 9000 --model-dir PicoGPT1-Daisy
+python serve.py --host 127.0.0.1 --port 9000 --model-dir PicoGPT1-Iris
 ```
 
 | Option | Défaut | Description |
 | --- | --- | --- |
 | `--host` | `127.0.0.1` | Adresse d'écoute |
 | `--port` | `8000` | Port d'écoute |
-| `--model-dir` | `PicoGPT1-Daisy` | Dossier du modèle |
+| `--model-dir` | `PicoGPT1-Iris` | Dossier du modèle |
 
 Arrêter le serveur avec `Ctrl+C`.

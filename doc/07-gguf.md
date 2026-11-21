@@ -2,7 +2,7 @@
 
 ## Pourquoi un GGUF ?
 
-Les scripts Python utilisent directement les poids Transformers (`model.safetensors`). llama.cpp / llama.app attendent un fichier **GGUF**. Le script `export_gguf.py` convertit le modèle local en `PicoGPT1-Daisy.gguf`.
+Les scripts Python utilisent directement les poids Transformers (`model.safetensors`). llama.cpp / llama.app attendent un fichier **GGUF**. Le script `export_gguf.py` convertit le modèle local en `PicoGPT1-Iris.gguf`.
 
 ## Commande
 
@@ -24,7 +24,7 @@ Le modèle GPT-2 est pris en charge par le convertisseur. Avec le GPT-2 complet 
 ## Vérification locale
 
 ```bash
-llama cli -m PicoGPT1-Daisy.gguf -st -p "What is 2+2?" -n 20
+llama cli -m PicoGPT1-Iris.gguf -st -p "What is 2+2?" -n 20
 ```
 
 Le GGUF contient le `chat_template` défini dans `tokenizer_config.json`, ce qui permet à llama.cpp d'utiliser le mode chat.
@@ -38,4 +38,4 @@ python export_gguf.py
 python publish_hf.py
 ```
 
-Les deux fichiers doivent rester synchronisés : le GGUF est généré à partir des poids présents dans `PicoGPT1-Daisy/`.
+Les deux fichiers doivent rester synchronisés : le GGUF est généré à partir des poids présents dans `PicoGPT1-Iris/`.
