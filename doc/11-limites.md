@@ -2,7 +2,7 @@
 
 ## Limites actuelles
 
-- Jeu de données réduit : 2 000 exemples Alpaca filtrés + 245 exemples d'ancrage.
+- Jeu de données réduit : 2 000 exemples Alpaca filtrés + 245 ancrages + 197 Q/R directes.
 - GPT-2 pré-entraîné ajusté (124 M paramètres), mais contexte effectivement limité à 256 tokens.
 - Le GGUF F16 pèse environ 328 Mo (poids FP32 : 498 Mo).
 - Aucun jeu de validation : le loss affiché est uniquement le loss d'entraînement.
@@ -13,7 +13,7 @@
 
 - **Base fermée de 30 faits** dans `knowledge.jsonl` : au-delà, le modèle s'abstient (`Je ne sais pas.`) au lieu d'inventer une réponse.
 - **Seuil `DEFAULT_MIN_SCORE = 0.50` à recalibrer** : trop haut, il refuse des questions couvertes ; trop bas, il accepte des questions hors base.
-- **10 réponses exactes sur 30** : l'extrait choisi est toujours supporté par le contexte (30/30), mais ce n'est pas toujours le meilleur extrait.
+- **30 réponses exactes sur 30** sur les formulations de la base : l'ancrage est vérifié, mais une question très reformulée peut retomber en abstention.
 - **Dépendance à scikit-learn** (`sklearn`) pour le TF-IDF, côté Python uniquement ; l'ancrage n'est pas présent dans le GGUF / llama.cpp.
 - **Pas de validation** : `evaluate.py` donne un diagnostic ponctuel, sans jeu de validation ni validation croisée du retrieval ou du seuil.
 

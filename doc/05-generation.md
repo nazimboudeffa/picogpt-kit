@@ -50,7 +50,7 @@ Le déroulement est le suivant :
 
 1. `knowledge.jsonl` est indexé par TF-IDF (`char_wb`, ngrammes de 3 à 5 caractères) sur `text + question`.
 2. Si le meilleur score est inférieur à `--min-score` (0,50 par défaut), aucun contexte n'est ajouté : le script renvoie immédiatement `Je ne sais pas.`
-3. Sinon, le prompt prend la forme `Contexte: <texte> | Question: <question>\n`. Le décodage est contraint (`prefix_allowed_tokens_fn`) aux tokens qui maintiennent la réponse comme extrait littéral du contexte ; les mots de plus de 2 caractères déjà dans la question sont exclus. La beam search est déterministe (`num_beams=5`, `do_sample=False`).
+3. Sinon, le prompt prend la forme `Contexte: <texte> | Question: <question>\n`. La génération est déterministe (`num_beams=5`, `do_sample=False`, `no_repeat_ngram_size=0`) ; la réponse est ensuite acceptée seulement si `is_supported()` la trouve dans le contexte, sinon `Je ne sais pas.` est renvoyé.
 4. `is_supported()` vérifie enfin que la réponse est bien un extrait du contexte ; sinon, abstention.
 
 `generate()` ajoute automatiquement le `\n` final au prompt s'il manque : ce séparateur était masqué dans les labels pendant l'entraînement.
@@ -68,7 +68,7 @@ Le réglage du seuil et les métriques sont détaillés dans [12-rag.md](12-rag.
 `model_utils.py` contient deux fonctions utilisées par `test.py` et `serve.py` :
 
 - `load_model(model_dir)` : charge tokenizer + modèle, passe en mode évaluation et neutralise `generation_config.max_length`.
-- `generate(tokenizer, model, prompt, ...)` : ajoute le `\n` final si besoin, tokenise le prompt (tronqué à 256 tokens), applique les réglages anti-boucles, s'arrête à l'EOS ou au premier saut de ligne généré, puis renvoie le texte décodé. Ses paramètres `return_full_text=False`, `prefix_allowed_tokens_fn` et `num_beams` servent à l'ancrage.
+- `generate(tokenizer, model, prompt, ...)` : ajoute le `\n` final si besoin, tokenise le prompt (tronqué à 256 tokens), applique les réglages anti-boucles, s'arrête à l'EOS ou au premier saut de ligne généré, puis renvoie le texte décodé. `rag.py` utilise `return_full_text=False`, `num_beams=5` et désactive `no_repeat_ngram_size` pour la beam search.
 
 Erreur attendue si les poids sont absents :
 

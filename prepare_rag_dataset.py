@@ -62,10 +62,13 @@ def main():
                 )
             )
 
-    # Peu d'exemples de refus : sans contexte uniquement. Les questions hors
-    # base sont gérées par is_supported() dans rag.py.
-    for item in items[:5]:
-        examples.append((f"{QUESTION_PREFIX}{item['question']}", ABSTENTION))
+    # Peu d'exemples de refus : uniquement pour des questions hors base.
+    # Les anciennes versions utilisaient items[:5] (des questions couvertes),
+    # ce qui apprenait au modèle à refuser des questions auxquelles il sait
+    # répondre. Les questions hors base sont aussi gérées par is_supported()
+    # dans rag.py à l'inférence.
+    for question in OUT_OF_SCOPE_QUESTIONS[:5]:
+        examples.append((f"{QUESTION_PREFIX}{question}", ABSTENTION))
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for i, (prompt, response) in enumerate(examples):

@@ -43,7 +43,7 @@ llama cli -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
 
 ## Les réponses sont incohérentes
 
-Le modèle par défaut est un GPT-2 pré-entraîné ajusté sur 2 245 exemples, ce qui améliore la fluence mais ne garantit pas l'exactitude. Vérifiez d'abord que le GGUF utilisé dans llama.app est bien celui issu du dernier entraînement (`python export_gguf.py`). Pour une réponse factuelle vérifiée, utilisez l'ancrage côté Python :
+Le modèle par défaut est un GPT-2 pré-entraîné ajusté sur 2 442 exemples, dont 197 questions/réponses directes couvrant les 30 faits de la base fermée. Vérifiez d'abord que le GGUF utilisé dans llama.app est bien celui issu du dernier entraînement (`python export_gguf.py`). Pour une réponse factuelle vérifiée, utilisez l'ancrage côté Python :
 
 ```bash
 python test.py --prompt "Quelle est la capitale de la France ?" --rag

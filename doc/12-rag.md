@@ -15,7 +15,7 @@ Ce chapitre décrit le pipeline d'ancrage ajouté au projet : le modèle ne rép
 
    Le saut de ligne final est ajouté automatiquement par `generate()` s'il manque : à l'entraînement, ce séparateur était masqué dans les labels.
 
-5. Le décodage est contraint par `prefix_allowed_tokens_fn` : seuls les tokens qui **maintiennent la réponse comme extrait littéral du contexte** sont autorisés. Les mots de plus de 2 caractères déjà présents dans la question sont exclus, pour éviter que le modèle ne recopie « la capitale de la France » au lieu d'extraire « Paris ». Le décodage est déterministe (`do_sample=False`, `num_beams=5`).
+5. La génération est déterministe (`do_sample=False`, `num_beams=5`, `no_repeat_ngram_size=0`). L'ancien décodage contraint (`prefix_allowed_tokens_fn`) a été retiré : avec le nouveau jeu de réponses directes, il tronquait les extraits (« 100 » au lieu de « 100 °C ») et interdisait les réponses complètes. La contrainte de `no_repeat_ngram_size=3` déformait aussi la beam search (« convertir la mitre des lumières »).
 6. Enfin, `is_supported()` normalise et vérifie que la réponse est bien un extrait du contexte. Si ce n'est pas le cas, le modèle s'abstient.
 
 ## Fichiers
@@ -24,12 +24,12 @@ Ce chapitre décrit le pipeline d'ancrage ajouté au projet : le modèle ne rép
 | --- | --- |
 | `knowledge.jsonl` | Base fermée de 30 faits en français, champs `id`, `text`, `question`, `answer` (**versionné**) |
 | `prepare_rag_dataset.py` | Génère `rag_train.txt` depuis `knowledge.jsonl` ; à lancer **après** `prepare_dataset.py` |
-| `rag_train.txt` | 245 exemples d'entraînement : 8 variantes ancrées par fait (240) + 5 exemples d'abstention sans contexte (**ignoré par Git**) |
-| `rag.py` | TF-IDF, construction du prompt, copie contrainte, `is_supported()`, `ABSTENTION = "Je ne sais pas."` |
+| `rag_train.txt` | 245 exemples d'entraînement : 8 variantes ancrées par fait (240) + 5 abstentions sur des questions hors base (**ignoré par Git**) |
+| `rag.py` | TF-IDF, construction du prompt, `is_supported()`, `ABSTENTION = "Je ne sais pas."` |
 | `evaluate.py` | Mesure exactitude, ancrage, abstentions et retrieval |
 | `test.py` | Flags `--rag`, `--rag-k`, `--min-score` |
 | `serve.py` | Champs JSON `use_rag`, `rag_k`, `min_score` |
-| `model_utils.py` | `generate()` avec `return_full_text=False`, `prefix_allowed_tokens_fn` et `num_beams` |
+| `model_utils.py` | `generate()` avec `return_full_text=False`, `num_beams` et `no_repeat_ngram_size` |
 
 La dépendance **scikit-learn** (`sklearn`) est requise pour le TF-IDF :
 
@@ -47,7 +47,7 @@ python prepare_rag_dataset.py   # rag_train.txt : exemples ancrés + abstention
 python train.py                 # DATA_PATHS = [train.txt, rag_train.txt]
 ```
 
-`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` et `MAX_EXAMPLES = 3000`. Le dernier entraînement porte sur **2 245 exemples** (2 000 Alpaca + 245 ancrés), en fine-tuning de GPT-2 sur 3 epochs (~1 686 steps). Le tokenizer est pris dans `PicoGPT1-Daisy/` s'il y est, sinon depuis le modèle de départ : cela évite une requête réseau TLS et garantit le même vocabulaire.
+`train.py` utilise `DATA_PATHS = [train.txt, rag_train.txt]` et `MAX_EXAMPLES = 3000`. Le dernier entraînement porte sur **2 442 exemples** (2 000 Alpaca + 245 ancrés + 197 réponses directes issues de `facts_train.txt`), en fine-tuning de GPT-2 sur 5 epochs. Le tokenizer est pris dans `PicoGPT1-Daisy/` s'il y est, sinon depuis le modèle de départ : cela évite une requête réseau TLS et garantit le même vocabulaire.
 
 Génération et évaluation :
 
@@ -87,7 +87,7 @@ Question: Quelle est la capitale de la France ?
 Je ne sais pas.
 ```
 
-Les variantes ancrées présentent le fait avec 0 à 4 autres faits avant/après, afin que le modèle apprenne à extraire la bonne réponse plutôt qu'à mémoriser un texte unique. Les 5 exemples d'abstention n'ont **jamais** de contexte. Les questions hors base sont gérées à l'inférence par `is_supported()` et le seuil.
+Les variantes ancrées présentent le fait avec 0 à 4 autres faits avant/après, afin que le modèle apprenne à extraire la bonne réponse plutôt qu'à mémoriser un texte unique. Les 5 exemples d'abstention portent sur des questions **hors base** et n'ont **jamais** de contexte. Auparavant, ils utilisaient les 5 premières questions couvertes, ce qui apprenait au modèle à refuser des questions auxquelles il savait répondre. Les questions hors base sont aussi gérées à l'inférence par `is_supported()` et le seuil.
 
 ## Réglage du seuil
 
@@ -103,14 +103,14 @@ Commande : `python evaluate.py`
 | Mesure | Résultat |
 | --- | --- |
 | Questions dans la base | 30 |
-| Réponses exactes | 10/30 |
+| Réponses exactes | 30/30 |
 | Réponses ancrées | 30/30 |
 | Abstentions à tort | 0/30 |
 | Retrieval correct | 30/30 |
 | Questions hors base | 10 |
 | Abstentions correctes | 10/10 |
 
-Interprétation : le modèle ne fabrique plus de fait absent du contexte ; l'extrait choisi n'est pas toujours le meilleur (10 exacts), mais il est toujours supporté par le texte récupéré.
+Interprétation : avec `facts_train.txt`, le modèle donne la bonne réponse aux 30 questions de la base ; chaque réponse est toujours supportée par le texte récupéré, et les questions hors base donnent `Je ne sais pas.`.
 
 ## Limites
 

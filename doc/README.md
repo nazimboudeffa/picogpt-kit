@@ -23,6 +23,7 @@ Cette documentation décrit le dépôt local, l'entraînement, la génération, 
 python -m pip install torch transformers datasets huggingface_hub scikit-learn
 python prepare_dataset.py --max-examples 2000
 python prepare_rag_dataset.py
+python prepare_facts_dataset.py
 python train.py
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
 python evaluate.py

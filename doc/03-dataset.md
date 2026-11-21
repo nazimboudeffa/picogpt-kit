@@ -2,11 +2,12 @@
 
 ## Générer les deux jeux de données
 
-La préparation se fait en deux étapes, **dans cet ordre** :
+La préparation se fait en trois étapes, **dans cet ordre** :
 
 ```bash
 python prepare_dataset.py --max-examples 2000   # Alpaca filtré → train.txt
 python prepare_rag_dataset.py                   # knowledge.jsonl → rag_train.txt
+python prepare_facts_dataset.py                 # knowledge.jsonl → facts_train.txt
 ```
 
 `prepare_dataset.py` télécharge le split `train` de `tatsu-lab/alpaca`, **filtre les exemples invalides** puis écrit jusqu'à **500 exemples valides** dans `train.txt` (ou 2 000 avec `--max-examples 2000`, recommandé). Sont écartés :
@@ -17,7 +18,9 @@ python prepare_rag_dataset.py                   # knowledge.jsonl → rag_train.
 
 `train.txt` est ignoré par Git.
 
-`prepare_rag_dataset.py` lit `knowledge.jsonl`, une **base fermée de 30 faits en français** (versionnée, champs `id`, `text`, `question`, `answer`) et écrit `rag_train.txt` (**ignoré par Git**) : 8 variantes ancrées par fait (240 exemples), plus 5 exemples d'abstention sans contexte, soit **245 exemples**. Il doit être lancé après `prepare_dataset.py`, car il importe `rag.py` et suit le même format de blocs.
+`prepare_rag_dataset.py` lit `knowledge.jsonl`, une **base fermée de 30 faits en français** (versionnée, champs `id`, `text`, `question`, `answer`) et écrit `rag_train.txt` (**ignoré par Git**) : 8 variantes ancrées par fait (240 exemples), plus 5 abstentions sur des questions **hors base**, soit **245 exemples**. Il doit être lancé après `prepare_dataset.py`, car il importe `rag.py` et suit le même format de blocs.
+
+`prepare_facts_dataset.py` écrit `facts_train.txt` (**ignoré par Git**) : 197 couples prompt/réponse **sans contexte**, générés depuis `knowledge.jsonl`. Chaque fait est présenté avec sa question exacte, sa version en minuscules, sans `?`, préfixée par `Question: `, et quelques reformulations (par exemple `quelle est la capitale de France ?`). Le fichier contient aussi des calculs simples (`que font 2+2 ?` → `4`) et cinq abstentions hors base. C'est ce jeu qui permet au GGUF de répondre directement dans llama.app, sans coller de contexte.
 
 Le détail du pipeline est dans [12-rag.md](12-rag.md).
 
@@ -78,14 +81,21 @@ Dans `prepare_rag_dataset.py` :
 | `KB_PATH` | `knowledge.jsonl` | Base de faits lue (versionnée) |
 | `OUTPUT_FILE` | `rag_train.txt` | Fichier de sortie (ignoré par Git) |
 
+Dans `prepare_facts_dataset.py` :
+
+| Constante | Valeur | Rôle |
+| --- | --- | --- |
+| `KB_PATH` | `knowledge.jsonl` | Base de faits lue (versionnée) |
+| `OUTPUT_FILE` | `facts_train.txt` | Fichier de sortie (ignoré par Git) |
+
 Dans `train.py` :
 
 | Constante | Valeur | Rôle |
 | --- | --- | --- |
-| `DATA_PATHS` | `[train.txt, rag_train.txt]` | Fichiers lus à l'entraînement |
+| `DATA_PATHS` | `[train.txt, rag_train.txt, facts_train.txt]` | Fichiers lus à l'entraînement |
 | `MAX_EXAMPLES` / `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 
-L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total utilisé pour le dernier entraînement est de 2 245 exemples (2 000 + 245), sous la limite de 3 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Daisy/` quand il y est, sinon depuis le modèle de départ (évite une requête réseau TLS).
+L'ancien `DATA_PATH` est remplacé par `DATA_PATHS` : un fichier absent est ignoré avec un avertissement. Le total utilisé pour le dernier entraînement est de 2 442 exemples (2 000 + 245 + 197), sous la limite de 3 000. Si vous agrandissez les jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total. Le tokenizer est chargé depuis `PicoGPT1-Daisy/` quand il y est, sinon depuis le modèle de départ (évite une requête réseau TLS).
 
 ## Dataset personnalisé
 

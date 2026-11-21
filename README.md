@@ -6,7 +6,7 @@
 
 Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisent directement les poids Transformers. Le format GGUF n'est produit que pour une utilisation optionnelle avec llama.cpp / llama.app.
 
-> ⚠️ **Modèle expérimental** : 2 245 exemples d'entraînement (2 000 Alpaca filtrés + 245 exemples d'ancrage) et 124 M paramètres (GPT-2 pré-entraîné ajusté). Sans ancrage, les réponses restent approximatives : l'objectif est de comprendre et de faire fonctionner la chaîne complète, pas de fournir un assistant généraliste.
+> ⚠️ **Modèle expérimental** : 2 442 exemples d'entraînement (2 000 Alpaca, 245 ancrages, 197 réponses directes) et 124 M paramètres (GPT-2 pré-entraîné ajusté). Les questions couvertes par la base fermée ont des réponses directes apprises ; au-delà, le modèle s'abstient ou se trompe. Ce n'est pas un assistant généraliste.
 
 ---
 
@@ -40,6 +40,7 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Données | `prepare_dataset.py` | `train.txt` (jusqu'à 2 000 couples prompt / réponse Alpaca validés avec `--max-examples 2000`) |
 | Connaissances | `knowledge.jsonl` | Base fermée de 30 faits en français (versionnée) |
 | Données ancrées | `prepare_rag_dataset.py` | `rag_train.txt` (245 exemples, ignoré par Git) |
+| Réponses directes | `prepare_facts_dataset.py` | `facts_train.txt` (197 exemples, ignoré par Git) |
 | Entraînement | `train.py` | Poids Transformers dans `PicoGPT1-Daisy/` |
 | Ancrage | `rag.py` | Réponse extraite du contexte ou `Je ne sais pas.` |
 | Évaluation | `evaluate.py` | Exactitude, ancrage, abstentions, retrieval |
@@ -52,10 +53,10 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 
 | Élément | Détail |
 | --- | --- |
-| Entraînement de référence | 2 245 exemples, 3 epochs de fine-tuning GPT-2, ~1 686 steps |
-| Jeu de données | `train.txt` (2 000 exemples Alpaca filtrés) + `rag_train.txt` (245 exemples ancrés / abstention) |
+| Entraînement de référence | 2 442 exemples, 5 epochs de fine-tuning GPT-2 |
+| Jeu de données | `train.txt` (2 000 Alpaca) + `rag_train.txt` (245 ancrés) + `facts_train.txt` (197 réponses directes) |
 | Base de connaissances | `knowledge.jsonl` : 30 faits en français, versionnée |
-| Évaluation RAG | 10/30 réponses exactes, 30/30 ancrées, 10/10 abstentions hors base |
+| Évaluation RAG | 30/30 réponses exactes, 30/30 ancrées, 0 abstention à tort, 10/10 abstentions hors base |
 | Poids locaux | `PicoGPT1-Daisy/model.safetensors` (**non versionné**) |
 | Modèle publié | [nazimboudeffa/PicoGPT1-Daisy](https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy) |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
@@ -86,13 +87,15 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 ├── model_utils.py             # chargement du modèle + génération (partagé)
 ├── prepare_dataset.py         # téléchargement Alpaca → train.txt
 ├── prepare_rag_dataset.py     # knowledge.jsonl → rag_train.txt
+├── prepare_facts_dataset.py   # knowledge.jsonl → facts_train.txt
 ├── publish_hf.py              # publication du modèle sur Hugging Face
-├── rag.py                     # TF-IDF, copie contrainte, abstention
+├── rag.py                     # TF-IDF, vérification d'ancrage, abstention
 ├── serve.py                   # serveur HTTP local
 ├── test.py                    # génération en ligne de commande
 ├── train.py                   # entraînement
 ├── train.txt                  # dataset généré, ignoré par Git
 ├── rag_train.txt              # dataset ancré généré, ignoré par Git
+├── facts_train.txt            # Q/R directes générées, ignoré par Git
 ├── PicoGPT1-Daisy.gguf      # export GGUF, ignoré par Git
 ├── MODEL_CARD.md              # fiche modèle publiée sur le Hub
 └── README.md                  # ce fichier
@@ -104,8 +107,9 @@ Le pipeline d'ancrage (RAG) est détaillé dans [doc/12-rag.md](doc/12-rag.md).
 | --- | --- |
 | `prepare_dataset.py` | Télécharge un sous-ensemble de `tatsu-lab/alpaca`, filtre les exemples invalides et écrit `train.txt` |
 | `prepare_rag_dataset.py` | Génère `rag_train.txt` depuis `knowledge.jsonl` (à lancer après `prepare_dataset.py`) |
-| `train.py` | Construit le GPT-2, entraîne sur `train.txt` et `rag_train.txt`, sauvegarde dans `PicoGPT1-Daisy/` |
-| `rag.py` | TF-IDF sur `knowledge.jsonl`, copie contrainte, vérification d'ancrage et abstention |
+| `prepare_facts_dataset.py` | Génère `facts_train.txt` : questions/réponses directes et variantes, pour llama.app |
+| `train.py` | Ajuste GPT-2 sur les trois fichiers, sauvegarde dans `PicoGPT1-Daisy/` |
+| `rag.py` | TF-IDF sur `knowledge.jsonl`, vérification d'ancrage et abstention |
 | `evaluate.py` | Mesure exactitude, ancrage, abstentions et retrieval du pipeline RAG |
 | `model_utils.py` | `load_model()` et `generate()`, utilisés par `test.py`, `serve.py` et `rag.py` |
 | `test.py` | Interface CLI pour générer une réponse, avec ou sans ancrage (`--rag`) |
@@ -228,7 +232,8 @@ Enchaînement complet, depuis le dépôt cloné :
 python -m pip install torch transformers datasets huggingface_hub scikit-learn
 python prepare_dataset.py --max-examples 2000   # crée train.txt (exemples Alpaca filtrés)
 python prepare_rag_dataset.py                   # crée rag_train.txt depuis knowledge.jsonl
-python train.py                                 # ajuste GPT-2 sur les deux fichiers
+python prepare_facts_dataset.py                 # crée facts_train.txt (Q/R directes)
+python train.py                                 # ajuste GPT-2 sur les trois fichiers
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
 python evaluate.py              # métriques d'ancrage et d'abstention
 python serve.py                 # API locale sur le port 8000
@@ -247,22 +252,25 @@ python publish_hf.py
 
 ## 6. Préparer le dataset
 
-La préparation des données se fait maintenant en **deux étapes**, dans cet ordre :
+La préparation des données se fait en **trois étapes**, dans cet ordre :
 
 ```bash
 python prepare_dataset.py --max-examples 2000   # 1. Alpaca filtré → train.txt
 python prepare_rag_dataset.py                   # 2. knowledge.jsonl → rag_train.txt
+python prepare_facts_dataset.py                 # 3. knowledge.jsonl → facts_train.txt
 ```
 
 `prepare_dataset.py` télécharge le split `train` de [`tatsu-lab/alpaca`](https://huggingface.co/datasets/tatsu-lab/alpaca) et écrit jusqu'à **500 exemples valides** dans `train.txt` (2 000 avec `--max-examples 2000`, recommandé). Les exemples dont la réponse s'étale sur plusieurs lignes, les doublons et quelques faits erronés connus (l'eau qui bout à 115 °C, le « mole » présenté comme un mammifère, `<nooutput>`) sont écartés : le parseur ne lit que deux lignes par bloc.
 
-`prepare_rag_dataset.py` doit être lancé **après** `prepare_dataset.py`. Il lit `knowledge.jsonl` (base fermée de 30 faits en français, champs `id`, `text`, `question`, `answer`, **versionnée**) et écrit `rag_train.txt` (**ignoré par Git**) : 8 variantes ancrées par fait, soit 240 exemples, auxquels s'ajoutent 5 exemples d'abstention sans contexte — **245 exemples au total**.
+`prepare_rag_dataset.py` doit être lancé **après** `prepare_dataset.py`. Il lit `knowledge.jsonl` (base fermée de 30 faits en français, champs `id`, `text`, `question`, `answer`, **versionnée**) et écrit `rag_train.txt` (**ignoré par Git**) : 8 variantes ancrées par fait, soit 240 exemples, auxquels s'ajoutent 5 abstentions sur des questions **hors base** — **245 exemples au total**.
+
+`prepare_facts_dataset.py` écrit `facts_train.txt` (**ignoré par Git**) : **197 exemples** de questions/réponses directes, sans contexte. Pour chaque fait, la question exacte, sa version en minuscules, sans point d'interrogation et préfixée par `Question: ` sont associées à la bonne réponse, avec quelques reformulations connues (`quelle est la capitale de France ?`, `capitale de la France`, etc.). Un petit jeu de calculs (`que font 2+2 ?` → `4`) et d'abstentions hors base complète le fichier. C'est ce jeu qui permet au GGUF de répondre directement dans llama.app.
 
 Le détail du pipeline est dans [doc/12-rag.md](doc/12-rag.md).
 
 ### Format attendu
 
-`train.py` lit les deux fichiers (`train.txt` et `rag_train.txt`) par blocs séparés par une ligne vide. Chaque bloc doit contenir **exactement deux lignes non vides** : le prompt puis la réponse.
+`train.py` lit les trois fichiers (`train.txt`, `rag_train.txt` et `facts_train.txt`) par blocs séparés par une ligne vide. Chaque bloc doit contenir **exactement deux lignes non vides** : le prompt puis la réponse.
 
 ```
 <prompt>
@@ -302,10 +310,11 @@ Je ne sais pas.
 | `prepare_dataset.py` | `OUTPUT_FILE` / `--output-file` | `train.txt` | Fichier de sortie |
 | `prepare_rag_dataset.py` | `KB_PATH` | `knowledge.jsonl` | Base de faits lue (versionnée) |
 | `prepare_rag_dataset.py` | `OUTPUT_FILE` | `rag_train.txt` | Fichier de sortie (ignoré par Git) |
-| `train.py` | `DATA_PATHS` | `[train.txt, rag_train.txt]` | Fichiers lus à l'entraînement |
+| `prepare_facts_dataset.py` | `KB_PATH` / `OUTPUT_FILE` | `knowledge.jsonl` / `facts_train.txt` | Q/R directes (ignoré par Git) |
+| `train.py` | `DATA_PATHS` | `[train.txt, rag_train.txt, facts_train.txt]` | Fichiers lus à l'entraînement |
 | `train.py` | `MAX_EXAMPLES` / `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
 
-L'ancienne constante `DATA_PATH` est remplacée par `DATA_PATHS` : un fichier manquant est simplement ignoré avec un avertissement. Le jeu utilisé fait 2 245 exemples (2 000 + 245), sous la limite de 3 000. Si vous changez la taille des jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total.
+L'ancienne constante `DATA_PATH` est remplacée par `DATA_PATHS` : un fichier manquant est simplement ignoré avec un avertissement. Le jeu utilisé fait 2 442 exemples (2 000 + 245 + 197), sous la limite de 3 000. Si vous changez la taille des jeux, gardez `MAX_EXAMPLES` de `train.py` supérieur au total.
 
 ### Dataset personnalisé
 
@@ -356,7 +365,7 @@ L'entraînement est piloté par des options CLI (`python train.py --help`). Les 
 
 ### Durée et sorties
 
-Dernier entraînement : **2 min 15 sur RTX 3070** (CUDA + `--fp16`), ~1 686 steps, loss moyenne 1,91 et dernière loss journalisée ≈ 1,59. Sur CPU, la même configuration prend environ 55 minutes. Le fine-tuning part de poids pré-entraînés : la loss est bien plus basse qu'avec un modèle entraîné de zéro (≈ 4,54 auparavant).
+Dernier entraînement : **4 min 11 sur RTX 3070** (CUDA + `--fp16`), 5 epochs (≈ 3 050 steps), loss moyenne 1,58 et dernière loss journalisée ≈ 1,05. Sur CPU, la même configuration prendrait nettement plus longtemps. Le fine-tuning part de poids pré-entraînés : la loss est bien plus basse qu'avec un modèle entraîné de zéro (≈ 4,54 auparavant).
 
 Fichiers générés dans `PicoGPT1-Daisy/` : `config.json`, `generation_config.json`, `model.safetensors`, `merges.txt`, `vocab.json`, `tokenizer.json`, `special_tokens_map.json`, `tokenizer_config.json`.
 
@@ -411,7 +420,7 @@ python test.py --prompt "Quelle est la capitale de la France ?" --rag
 
 ### Génération ancrée (`--rag`)
 
-Avec `--rag`, `test.py` passe par `rag.py` : un passage de `knowledge.jsonl` est récupéré par TF-IDF, inséré dans le prompt au format `Contexte: <texte> | Question: <question>\n`, puis la réponse est contrainte à rester un extrait littéral du contexte. Si le score de récupération est inférieur à `--min-score` (0,50 par défaut), aucun contexte n'est fourni et le script renvoie immédiatement `Je ne sais pas.`
+Avec `--rag`, `test.py` passe par `rag.py` : un passage de `knowledge.jsonl` est récupéré par TF-IDF, inséré dans le prompt au format `Contexte: <texte> | Question: <question>\n`, puis la réponse générée n'est acceptée que si elle est un extrait du contexte (`is_supported()`). Si le score de récupération est inférieur à `--min-score` (0,50 par défaut), aucun contexte n'est fourni et le script renvoie immédiatement `Je ne sais pas.`
 
 ```bash
 python test.py --prompt "Quelle est la capitale de la France ?" --rag
@@ -432,7 +441,7 @@ tokenizer, model = load_model("PicoGPT1-Daisy")
 print(generate(tokenizer, model, "What is 2+2?\n", do_sample=True))
 ```
 
-`load_model()` charge tokenizer + modèle, passe en mode évaluation et neutralise `generation_config.max_length` pour éviter un conflit avec `max_new_tokens`. `generate()` tronque le prompt à 256 tokens (en ajoutant le `\n` final si besoin), applique les réglages anti-boucles (échantillonnage, `top_k=40`, `repetition_penalty=1.15`, `no_repeat_ngram_size=3`), s'arrête à l'EOS ou au premier saut de ligne généré, puis renvoie le texte décodé. Les paramètres `return_full_text`, `prefix_allowed_tokens_fn` et `num_beams` sont décrits à la section 13.
+`load_model()` charge tokenizer + modèle, passe en mode évaluation et neutralise `generation_config.max_length` pour éviter un conflit avec `max_new_tokens`. `generate()` tronque le prompt à 256 tokens (en ajoutant le `\n` final si besoin), applique les réglages anti-boucles (échantillonnage, `top_k=40`, `repetition_penalty=1.15`, `no_repeat_ngram_size=3`), s'arrête à l'EOS ou au premier saut de ligne généré, puis renvoie le texte décodé. Les paramètres `return_full_text`, `prefix_allowed_tokens_fn` et `num_beams` sont décrits à la section 13. `rag.py` utilise `do_sample=False`, `num_beams=5` et `no_repeat_ngram_size=0` : ce dernier réglage évite que l'interdiction des trigrammes ne déforme les réponses en beam search.
 
 Si les poids sont absents, le message suivant s'affiche :
 
@@ -579,7 +588,7 @@ python publish_hf.py
 
 ### Après l'ajout du pipeline RAG
 
-Les exemples `rag_train.txt` font désormais partie de l'entraînement : après `python prepare_rag_dataset.py` et `python train.py`, **pensez à régénérer le GGUF** avec `python export_gguf.py` avant de le tester dans llama.app, puis à le republier si besoin. Le GGUF ne contient ni `knowledge.jsonl` ni le code TF-IDF : l'ancrage (`--rag`, `use_rag`) fonctionne uniquement côté scripts Python, avec `scikit-learn` installé.
+Les exemples `rag_train.txt` et `facts_train.txt` font désormais partie de l'entraînement : après `python prepare_rag_dataset.py`, `python prepare_facts_dataset.py` et `python train.py`, **pensez à régénérer le GGUF** avec `python export_gguf.py` avant de le tester dans llama.app, puis à le republier si besoin. Le GGUF ne contient ni `knowledge.jsonl` ni le code TF-IDF : l'ancrage (`--rag`, `use_rag`) fonctionne uniquement côté scripts Python, avec `scikit-learn` installé.
 
 ---
 
@@ -632,13 +641,15 @@ llama serve -hf nazimboudeffa/PicoGPT1-Daisy -hff PicoGPT1-Daisy.gguf
 # puis ouvrir http://localhost:9931
 ```
 
-> **Anti-hallucination dans llama.app** : le GGUF ne contient pas le RAG Python, mais le modèle sait extraire une réponse d'un contexte. Collez le fait utile de `knowledge.jsonl` dans le prompt au format appris :
+> **Anti-hallucination dans llama.app** : le GGUF ne contient pas le RAG Python, mais le modèle a appris les 30 faits de `knowledge.jsonl` en réponses directes. Une question simple comme `quelle est la capitale de France ?` donne maintenant `Paris`, et `que font 2+2 ?` donne `4`, sans coller de contexte.
+>
+> Pour un fait peu courant ou une formulation éloignée, le format avec contexte reste disponible :
 >
 > ```
 > Contexte: La capitale de la France est Paris. | Question: Quelle est la capitale de la France ?
 > ```
 >
-> Le modèle répond alors `Paris` au lieu d'inventer. Le format et les limites sont détaillés dans [doc/08-huggingface.md](doc/08-huggingface.md).
+> Le format et les limites sont détaillés dans [doc/08-huggingface.md](doc/08-huggingface.md).
 
 ### Avec Transformers
 
@@ -711,7 +722,7 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 | Paramètre | Défaut | Rôle |
 | --- | --- | --- |
 | `return_full_text` | `True` | Avec `False`, ne renvoie que la réponse générée (utile pour l'ancrage). |
-| `prefix_allowed_tokens_fn` | `None` | Fonction `(batch_id, input_ids)` qui limite les tokens autorisés à chaque étape. `rag.py` n'autorise que les tokens maintenant la réponse comme extrait littéral du contexte, et exclut les mots de plus de 2 caractères déjà présents dans la question. |
+| `prefix_allowed_tokens_fn` | `None` | Hook générique `(batch_id, input_ids)` limitant les tokens autorisés à chaque étape. Anciennement utilisé par `rag.py` pour forcer la copie littérale du contexte ; abandonné car il tronquait les réponses. L'ancrage est désormais vérifié après génération par `is_supported()`. |
 | `num_beams` | `1` | Beam search ; `rag.py` passe à `5` avec `do_sample=False` pour un décodage déterministe. |
 
 `rag.py` vérifie ensuite `is_supported(answer, context)` : si la réponse n'est pas un extrait du contexte, il renvoie `Je ne sais pas.`. Voir [doc/12-rag.md](doc/12-rag.md).
@@ -750,7 +761,7 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 ### Limites du pipeline RAG
 
 - Base **fermée de 30 faits** : aucune question hors de `knowledge.jsonl` ne peut recevoir de réponse factuelle (abstention attendue).
-- Sur les 30 questions de la base, seulement **10 réponses exactes** : l'extrait copié est toujours supporté par le contexte (30/30), mais ce n'est pas toujours le meilleur.
+- Les **30 questions de la base** obtiennent désormais la bonne réponse exacte et ancrée. Ce résultat reste limité aux formulations apprises : une reformulation éloignée peut retomber en abstention.
 - Seuil `DEFAULT_MIN_SCORE = 0.50` à recalibrer selon les reformulations et la taille de la base.
 - Dépendance à **scikit-learn** (`sklearn`) pour le TF-IDF ; l'ancrage n'existe pas dans le GGUF / llama.cpp.
 - Aucune validation croisée du retrieval ni du seuil : `evaluate.py` fournit un diagnostic ponctuel, pas un jeu de validation.

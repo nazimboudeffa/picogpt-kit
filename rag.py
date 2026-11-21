@@ -92,70 +92,30 @@ def is_supported(answer, context):
     return bool(answer_norm) and answer_norm in context_norm
 
 
-_TOKEN_TEXTS = {}
-
-
-def _token_texts(tokenizer):
-    """Texte normalisé de chaque token, calculé une seule fois."""
-    key = id(tokenizer)
-    if key not in _TOKEN_TEXTS:
-        _TOKEN_TEXTS[key] = [
-            normalize(tokenizer.decode([token_id])) for token_id in range(len(tokenizer))
-        ]
-    return _TOKEN_TEXTS[key]
-
-
-def make_copy_constraint(tokenizer, context, question, prompt_len):
-    """N'autorise que les tokens maintenant la réponse dans le contexte.
-
-    Le token doit aussi être absent de la question : sans cela, le modèle
-    recopie « la capitale de la France » au lieu d'extraire « Paris ».
-    """
-    ctx = normalize(context)
-    q = normalize(question)
-    texts = _token_texts(tokenizer)
-    allowed = [
-        token_id
-        for token_id, text in enumerate(texts)
-        if text
-        and text in ctx
-        and (len(text) <= 2 or text not in q)  # garder H2O, 300, etc.
-    ]
-    eos = tokenizer.eos_token_id
-
-    def constraint(batch_id, input_ids):
-        # Selon les versions de transformers, `input_ids` est 1D ou 2D.
-        generated_ids = (
-            input_ids[prompt_len:] if input_ids.dim() == 1 else input_ids[0, prompt_len:]
-        )
-        generated = tokenizer.decode(generated_ids, skip_special_tokens=True)
-        prefix = normalize(generated)
-        return [token_id for token_id in allowed if prefix + texts[token_id] in ctx] + [
-            eos
-        ]
-
-    return constraint
-
-
 def answer_with_rag(tokenizer, model, question, k=1, min_score=DEFAULT_MIN_SCORE, **gen_kwargs):
-    """Récupère un contexte, génère par copie contrainte, puis vérifie l'ancrage."""
+    """Récupère un contexte, génère une réponse, puis vérifie son ancrage.
+
+    Anciennement, le décodage était contraint aux tokens du contexte. Avec le
+    nouveau jeu de réponses directes (`facts_train.txt`), cette contrainte
+    tronquait les réponses (« 100 » au lieu de « 100 °C ») et pouvait provoquer
+    une abstention à tort. La génération déterministe donne désormais la
+    réponse complète ; `is_supported()` conserve la garantie d'ancrage.
+    """
     prompt, context = get_kb().build_prompt(question, k=k, min_score=min_score)
     if context is None:
         return ABSTENTION
 
-    prompt_len = len(tokenizer(prompt, add_special_tokens=False)["input_ids"])
-    constraint = make_copy_constraint(tokenizer, context, question, prompt_len)
-
-    # La copie contrainte doit être déterministe : avec du sampling, le modèle
-    # s'arrête sur des tronçons (« Merc », « 300 ») au lieu de l'extrait complet.
+    # Décodage déterministe : reproductible, sans troncature liée à la contrainte.
+    # `no_repeat_ngram_size=3`, utile en échantillonnage libre, casse la beam
+    # search sur ce modèle (réponses du type « convertir la mitre des lumières »).
     gen_kwargs["do_sample"] = False
+    gen_kwargs["no_repeat_ngram_size"] = 0
     gen_kwargs.setdefault("num_beams", 5)
     generated = generate(
         tokenizer,
         model,
         prompt,
         return_full_text=False,
-        prefix_allowed_tokens_fn=constraint,
         **gen_kwargs,
     ).strip()
     if not is_supported(generated, context):

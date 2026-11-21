@@ -5,6 +5,7 @@
 ```bash
 python prepare_dataset.py --max-examples 2000   # train.txt : 2 000 exemples Alpaca filtrés
 python prepare_rag_dataset.py                   # rag_train.txt : 245 exemples ancrés
+python prepare_facts_dataset.py                 # facts_train.txt : 197 Q/R directes
 python train.py                                 # fine-tuning de GPT-2 (défaut)
 ```
 
@@ -24,7 +25,7 @@ Les options `--n-layer`, `--n-embd` et `--n-head` ne sont utilisées qu'avec `--
 
 | Option | Défaut | Description |
 | --- | --- | --- |
-| `--data-paths` | `train.txt rag_train.txt` | Fichiers d'exemples (un fichier absent est ignoré) |
+| `--data-paths` | `train.txt rag_train.txt facts_train.txt` | Fichiers d'exemples (un fichier absent est ignoré) |
 | `--output-dir` | `PicoGPT1-Daisy` | Dossier de sauvegarde |
 | `--max-len` | `256` | Longueur maximale du contexte |
 | `--max-examples` | `3000` | Nombre maximum d'exemples, tous fichiers confondus |
@@ -69,4 +70,4 @@ python export_gguf.py
 
 ## Durée observée
 
-Dernier fine-tuning (2 245 exemples, 3 epochs, 1 686 steps) : **134,7 s sur RTX 3070** en `--fp16` (12,5 steps/s, ~50 exemples/s), contre ~55 min sur CPU. Loss moyenne : 1,91 ; dernière loss journalisée : 1,59.
+Dernier fine-tuning (2 442 exemples, 5 epochs, ≈ 3 050 steps) : **250,8 s sur RTX 3070** en `--fp16` (12,2 steps/s, ~49 exemples/s), contre nettement plus sur CPU. Loss moyenne : 1,58 ; dernière loss journalisée : 1,05.

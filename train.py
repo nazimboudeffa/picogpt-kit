@@ -24,7 +24,11 @@ from transformers import (
     TrainingArguments,
 )
 
-DATA_PATHS = [Path("train.txt"), Path("rag_train.txt")]
+DATA_PATHS = [
+    Path("train.txt"),
+    Path("rag_train.txt"),
+    Path("facts_train.txt"),
+]
 OUTPUT_DIR = Path("PicoGPT1-Daisy")
 
 MAX_LEN = 256          # taille du contexte

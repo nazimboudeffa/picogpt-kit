@@ -14,7 +14,7 @@ tags:
 
 # PicoGPT1-Daisy
 
-GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, complété de 245 exemples d'ancrage issus d'une base fermée de 30 faits.
+GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, 245 exemples d'ancrage et 197 questions/réponses directes issus d'une base fermée de 30 faits (2 442 exemples au total).
 
 - Architecture : GPT-2 complet, 12 couches, 768 dimensions, 12 têtes d'attention (124 M paramètres)
 - Contexte : 1 024 positions dans le modèle, exemples tronqués à 256 tokens
@@ -31,11 +31,11 @@ L'ancien dépôt [`nazimboudeffa/PicoGPT1-Jasmine`](https://huggingface.co/nazim
 | Élément | `PicoGPT1-Jasmine` (ancien) | `PicoGPT1-Daisy` (ce dépôt) |
 | --- | --- | --- |
 | Architecture | GPT-2 : 2 couches, 128 dims, 2 têtes, contexte 256 | **GPT-2 complet** : 12 couches, 768 dims, 12 têtes (124 M paramètres) |
-| Jeu d'entraînement | 500 exemples Alpaca bruts | 2 000 exemples Alpaca **filtrés** + 245 exemples d'ancrage = **2 245 exemples** |
+| Jeu d'entraînement | 500 exemples Alpaca bruts | 2 000 Alpaca **filtrés** + 245 ancrages + 197 Q/R directes = **2 442 exemples** |
 | Données | Quelques erreurs factuelles et doublons | Erreurs connues retirées (eau à 115 °C, fausse définition du « mole », `<nooutput>`), doublons supprimés, format uniformisé |
 | Décodage | Glouton par défaut, boucles fréquentes | Échantillonnage par défaut (`top_k=40`, `no_repeat_ngram_size=3`, `repetition_penalty=1.15`), arrêt à l'EOS ou au premier `\n`, séparateur `\n` garanti |
-| Ancrage / abstention | Aucun | `knowledge.jsonl` (30 faits), TF-IDF, copie contrainte du contexte, `Je ne sais pas.` hors base |
-| Entraînement | 10 epochs depuis zéro, ~1 250 steps, loss finale ≈ 4,95 | 3 epochs de fine-tuning, ~1 686 steps |
+| Ancrage / abstention | Aucun | `knowledge.jsonl` (30 faits), TF-IDF, vérification d'ancrage, `Je ne sais pas.` hors base |
+| Entraînement | 10 epochs depuis zéro, ~1 250 steps, loss finale ≈ 4,95 | 5 epochs de fine-tuning (2 442 exemples) |
 | GGUF | Ancien export | Régénéré depuis les nouveaux poids |
 
 En résumé : **modèle plus grand issu de GPT-2 pré-entraîné, données nettoyées, décodage corrigé et ancrage anti-hallucination** côté Python. Le passage à GPT-2 pré-entraîné améliore la cohérence des réponses en génération libre, y compris dans le GGUF. Le code source et la documentation détaillée sont dans <https://github.com/nazimboudeffa/picogpt1-daisy>.
@@ -72,7 +72,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 
 ## Ancrage (RAG)
 
-Le dépôt fournit un pipeline d'ancrage côté Python : `rag.py` récupère un fait dans `knowledge.jsonl` avec un TF-IDF (`char_wb` 3-5) sur `text + question`, construit le prompt `Contexte: <texte> | Question: <question>\n`, contraint le décodage aux extraits littéraux du contexte (beam search déterministe, `num_beams=5`), puis vérifie `is_supported()`. Si le score est inférieur à 0,50 ou si la réponse n'est pas supportée, le modèle répond `Je ne sais pas.`
+Le dépôt fournit un pipeline d'ancrage côté Python : `rag.py` récupère un fait dans `knowledge.jsonl` avec un TF-IDF (`char_wb` 3-5) sur `text + question`, construit le prompt `Contexte: <texte> | Question: <question>\n`, génère en beam search déterministe (`num_beams=5`) puis vérifie `is_supported()`. Si le score est inférieur à 0,50 ou si la réponse n'est pas extraite du contexte, le modèle répond `Je ne sais pas.`
 
 - `python test.py --prompt "Quelle est la capitale de la France ?" --rag`
 - `python evaluate.py` (nécessite `scikit-learn`)
@@ -83,11 +83,11 @@ Métriques actuelles (`python evaluate.py`) :
 | Mesure | Résultat |
 | --- | --- |
 | Questions dans la base | 30 |
-| Réponses exactes | 10/30 |
+| Réponses exactes | 30/30 |
 | Réponses ancrées | 30/30 |
 | Abstentions à tort | 0/30 |
 | Retrieval correct | 30/30 |
 | Questions hors base | 10 |
 | Abstentions correctes | 10/10 |
 
-Interprétation : le modèle ne fabrique plus de fait absent du contexte ; l'extrait choisi n'est pas toujours le meilleur (10 exacts), mais il est toujours supporté par le texte récupéré. Détails dans `doc/12-rag.md`.
+Interprétation : avec les 197 réponses directes ajoutées à l'entraînement, le modèle donne la bonne réponse aux 30 questions de la base, et chaque réponse reste un extrait du contexte récupéré. Les abstentions hors base fonctionnent toujours. Ce résultat ne couvre que les formulations proches de la base fermée. Détails dans `doc/12-rag.md`.

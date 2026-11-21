@@ -53,13 +53,20 @@ Le port par défaut du serveur llama.app est `9931`.
 
 ## Éviter les hallucinations dans llama.app
 
-Le GGUF ne contient ni `knowledge.jsonl` ni le code TF-IDF : sans contexte, le modèle peut répondre n'importe quoi de manière fluide. En revanche, il a été entraîné à **extraire la réponse d'un contexte** fourni dans le prompt. Dans llama.app, collez le fait utile dans le format appris :
+Le GGUF ne contient ni `knowledge.jsonl` ni le code TF-IDF, mais le dernier entraînement inclut `facts_train.txt` : **197 questions/réponses directes** couvrant les 30 faits de la base fermée (avec variantes de formulations et quelques calculs simples). Dans llama.app, vous pouvez donc poser directement :
+
+```
+quelle est la capitale de France ?      → Paris
+que font 2+2 ?                          → 4
+```
+
+Le modèle sait toujours **extraire la réponse d'un contexte** fourni dans le prompt. Pour un fait peu courant ou une formulation très éloignée de celles apprises, collez le fait utile dans le format appris :
 
 ```
 Contexte: La capitale de la France est Paris. | Question: Quelle est la capitale de la France ?
 ```
 
-Le modèle répond `Paris`. Plusieurs faits peuvent être placés dans le `Contexte:`, séparés par des espaces : le modèle choisit toujours l'extrait qui répond à la question. Les faits sont dans `knowledge.jsonl` (champ `text`). Le pipeline Python (`python test.py --rag`) fait automatiquement cette sélection par TF-IDF ; dans llama.app, elle doit être faite manuellement.
+Plusieurs faits peuvent être placés dans le `Contexte:`, séparés par des espaces : le modèle choisit l'extrait qui répond à la question. Les faits sont dans `knowledge.jsonl` (champ `text`). Le pipeline Python (`python test.py --rag`) fait automatiquement cette sélection par TF-IDF ; dans llama.app, elle doit être faite manuellement.
 
 ## Tester avec Transformers
 
