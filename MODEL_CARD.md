@@ -9,16 +9,16 @@ tags:
   - llama.app
   - alpaca
   - instruction
-  - daisy
+  - iris
   - rag
   - abstention
 ---
 
 # PicoGPT1-Iris
 
-> Release `1.0.0` — codename Iris. Les versions et les noms de fleurs sont décrits dans le dépôt source (`CHANGELOG.md`).
+> Release `1.1.0` — codename Iris. Les versions et les noms de fleurs sont décrits dans le dépôt source (`CHANGELOG.md`).
 
-GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, 245 exemples d'ancrage et 197 questions/réponses directes issus d'une base fermée de 30 faits (2 442 exemples au total).
+GPT-2 pré-entraîné ajusté sur 2 000 instructions/réponses Alpaca filtrées, 245 exemples d'ancrage, 197 questions/réponses directes issus d'une base fermée de 30 faits, 90 exemples de refus « proches de la base » et 120 reformulations ancrées (2 652 exemples au total).
 
 - Architecture : GPT-2 complet, 12 couches, 768 dimensions, 12 têtes d'attention (124 M paramètres)
 - Contexte : 1 024 positions dans le modèle, exemples tronqués à 256 tokens
@@ -35,11 +35,11 @@ L'ancien dépôt [`nazimboudeffa/PicoGPT1-Jasmine`](https://huggingface.co/nazim
 | Élément | `PicoGPT1-Jasmine` (ancien) | `PicoGPT1-Iris` (ce dépôt) |
 | --- | --- | --- |
 | Architecture | GPT-2 : 2 couches, 128 dims, 2 têtes, contexte 256 | **GPT-2 complet** : 12 couches, 768 dims, 12 têtes (124 M paramètres) |
-| Jeu d'entraînement | 500 exemples Alpaca bruts | 2 000 Alpaca **filtrés** + 245 ancrages + 197 Q/R directes = **2 442 exemples** |
+| Jeu d'entraînement | 500 exemples Alpaca bruts | 2 000 Alpaca **filtrés** + 245 ancrages + 197 Q/R directes + 90 refus + 120 reformulations = **2 652 exemples** |
 | Données | Quelques erreurs factuelles et doublons | Erreurs connues retirées (eau à 115 °C, fausse définition du « mole », `<nooutput>`), doublons supprimés, format uniformisé |
 | Décodage | Glouton par défaut, boucles fréquentes | Échantillonnage par défaut (`top_k=40`, `no_repeat_ngram_size=3`, `repetition_penalty=1.15`), arrêt à l'EOS ou au premier `\n`, séparateur `\n` garanti |
 | Ancrage / abstention | Aucun | `knowledge.jsonl` (30 faits), TF-IDF, vérification d'ancrage, `Je ne sais pas.` hors base |
-| Entraînement | 10 epochs depuis zéro, ~1 250 steps, loss finale ≈ 4,95 | 5 epochs de fine-tuning (2 442 exemples) |
+| Entraînement | 10 epochs depuis zéro, ~1 250 steps, loss finale ≈ 4,95 | 5 epochs de fine-tuning (2 652 exemples) |
 | GGUF | Ancien export | Régénéré depuis les nouveaux poids |
 
 En résumé : **modèle plus grand issu de GPT-2 pré-entraîné, données nettoyées, décodage corrigé et ancrage anti-hallucination** côté Python. Le passage à GPT-2 pré-entraîné améliore la cohérence des réponses en génération libre, y compris dans le GGUF. Le code source et la documentation détaillée sont dans <https://github.com/nazimboudeffa/picogpt-kit>.
@@ -82,7 +82,7 @@ Le dépôt fournit un pipeline d'ancrage côté Python : `rag.py` récupère un 
 - `python evaluate.py` (nécessite `scikit-learn`)
 - Le GGUF ne contient ni la base de faits ni le TF-IDF : l'ancrage fonctionne uniquement via les scripts Python.
 
-Métriques actuelles (`python evaluate.py`) :
+Métriques sur le jeu canonique (`python evaluate.py`) :
 
 | Mesure | Résultat |
 | --- | --- |
@@ -94,4 +94,16 @@ Métriques actuelles (`python evaluate.py`) :
 | Questions hors base | 10 |
 | Abstentions correctes | 10/10 |
 
-Interprétation : avec les 197 réponses directes ajoutées à l'entraînement, le modèle donne la bonne réponse aux 30 questions de la base, et chaque réponse reste un extrait du contexte récupéré. Les abstentions hors base fonctionnent toujours. Ce résultat ne couvre que les formulations proches de la base fermée. Détails dans `doc/12-rag.md`.
+Ce résultat reste optimiste : les 30 questions canoniques ont servi à l'entraînement.
+
+Benchmark figé (`python evaluate.py --split test`, 40 questions jamais vues) :
+
+| Mesure | Résultat |
+| --- | --- |
+| Réponses exactes dans la base | 29/30 |
+| Réponses ancrées | 30/30 |
+| Retrieval correct | 30/30 |
+| Abstentions hors base éloignées | 5/5 |
+| Abstentions hors base proches | 2/5 |
+
+Le point faible reste les questions hors base proches d'un fait connu : 3 cas sur 5 donnent encore une réponse recopiée du fait le plus proche. À comparer avec Daisy (28/30 exactes, 1/5 hors base proches). Détails dans `doc/14-benchmark.md` du dépôt source.
