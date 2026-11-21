@@ -21,7 +21,11 @@ from rag import ABSTENTION, DEFAULT_MIN_SCORE, get_kb
 KB_PATH = Path("knowledge.jsonl")
 OUTPUT_FILE = Path("negative_train.txt")
 
-# Trois questions hors base par fait : même domaine, entité différente.
+# Questions hors base par fait : même domaine, entité différente.
+# Leur nombre est à équilibrer avec les reformulations positives : trop de
+# refus font abstiner le modèle sur des questions pourtant couvertes.
+PER_FACT = 3
+
 NEAR_MISS = {
     "capital_fr": [
         "Quelle est la capitale du Portugal ?",
@@ -191,7 +195,7 @@ def main():
     examples = []
     seen = set()
     for fact_id, questions in NEAR_MISS.items():
-        for question in questions:
+        for question in questions[:PER_FACT]:
             if question in seen:
                 raise SystemExit(f"Question dupliquée : {question}")
             seen.add(question)

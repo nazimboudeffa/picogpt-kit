@@ -15,8 +15,10 @@ Format d'une release : `PicoGPT<majeure>-<Fleur>`, avec un tag git `v<version>-<
 
 Changement de codename : `PicoGPT1-Daisy` → `PicoGPT1-Iris`.
 
-- Ajout : 90 exemples négatifs générés par `prepare_negative_dataset.py` (questions même domaine mais entité absente de la base) pour apprendre à refuser le contexte retrieved à tort.
+- Ajout : 90 exemples négatifs générés par `prepare_negative_dataset.py` (questions même domaine mais entité absente de la base) pour apprendre à refuser le contexte récupéré à tort.
+- Ajout : 120 reformulations ancrées générées par `prepare_paraphrase_dataset.py`, pour éviter que le modèle n'apprenne « formulation inédite → abstention ».
 - Réglage : `DEFAULT_MIN_SCORE` passe de 0,50 à 0,40 ; deux reformulations couvertes étaient refusées juste sous l'ancien seuil.
+- Résultat mesuré sur le jeu figé : 29/30 exactes, 30/30 ancrées, 30/30 retrieval, 5/5 hors base éloignées, 2/5 hors base proches (`reports/iris-test.json`). Gain net de 1 point sur Daisy (36/40 contre 35/40), mais le problème d'hallucination proche n'est que partiellement corrigé.
 
 ## [1.0.0] — Daisy — 2026-11-21
 

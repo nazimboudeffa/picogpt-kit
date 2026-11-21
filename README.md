@@ -56,13 +56,14 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 
 | Élément | Détail |
 | --- | --- |
-| Entraînement de référence | 2 442 exemples, 5 epochs de fine-tuning GPT-2 |
-| Jeu de données | `train.txt` (2 000 Alpaca) + `rag_train.txt` (245 ancrés) + `facts_train.txt` (197 réponses directes) |
+| Entraînement de référence | 2 652 exemples, 5 epochs de fine-tuning GPT-2 |
+| Jeu de données | `train.txt` (2 000 Alpaca) + `rag_train.txt` (245 ancrés) + `facts_train.txt` (197 réponses directes) + `negative_train.txt` (90 refus) + `paraphrase_train.txt` (120 reformulations ancrées) |
 | Base de connaissances | `knowledge.jsonl` : 30 faits en français, versionnée |
 | Évaluation RAG (jeu train) | 30/30 réponses exactes, 30/30 ancrées, 0 abstention à tort, 10/10 abstentions hors base |
-| Benchmark figé (jeu test) | 28/30 exactes, 30/30 retrieval, 5/5 abstentions hors base éloignées, 1/5 hors base proches (`reports/daisy-test.json`) |
+| Benchmark figé (jeu test) | Iris : 29/30 exactes, 30/30 ancrées, 30/30 retrieval, 5/5 hors base éloignées, 2/5 hors base proches (`reports/iris-test.json`) |
+| Référence Daisy (jeu test) | 28/30 exactes, 30/30 retrieval, 5/5 hors base éloignées, 1/5 hors base proches (`reports/daisy-test.json`) |
 | Poids locaux | `PicoGPT1-Iris/model.safetensors` (**non versionné**) |
-| Modèle publié | [nazimboudeffa/PicoGPT1-Iris](https://huggingface.co/nazimboudeffa/PicoGPT1-Iris) |
+| Modèle publié | Daisy : <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>. Iris : dépôt prévu, non publié pour l'instant. |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Versions utilisées | Python 3.13 / Windows 11, `transformers` 4.52.4, `huggingface_hub` 0.33.0, `torch` CPU |
 
@@ -631,7 +632,7 @@ Les exemples `rag_train.txt` et `facts_train.txt` font désormais partie de l'en
 
 ## 11. Publier sur Hugging Face
 
-Le modèle est publié publiquement ici : **[nazimboudeffa/PicoGPT1-Iris](https://huggingface.co/nazimboudeffa/PicoGPT1-Iris)**.
+Dernière release publiée : **Daisy** — <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>. Iris est entraînée localement mais son dépôt n'est pas encore publié.
 
 ### Prérequis
 
@@ -798,8 +799,8 @@ La signature de `generate()` comprend aussi trois paramètres utilisés par `rag
 ### Limites du pipeline RAG
 
 - Base **fermée de 30 faits** : aucune question hors de `knowledge.jsonl` ne peut recevoir de réponse factuelle (abstention attendue).
-- Les **30 questions de la base** obtiennent la bonne réponse exacte et ancrée, mais ce score est optimiste : sur 30 reformulations jamais vues, on tombe à 28/30.
-- Les questions **hors base proches d'un fait connu** posent le plus de problèmes : 1/5 abstention seulement. Le modèle recopie la réponse du fait le plus proche (capitale de l'Espagne → Paris, formule du sel → H2O). C'est la cible prioritaire de la prochaine itération.
+- Les **30 questions canoniques** donnent 30/30, mais ce score reste optimiste : sur 30 reformulations jamais vues, Daisy fait 28/30 et Iris 29/30.
+- Les questions **hors base proches** restent le point faible : Daisy 1/5 abstention, Iris 2/5. Le modèle recopie parfois la réponse du fait le plus proche (capitale de l'Espagne → Paris, formule du sel → H2O). L'ajout de 90 exemples négatifs et 120 reformulations ancrées améliore l'in-scope mais ne règle pas complètement ce problème.
 - Seuil `DEFAULT_MIN_SCORE = 0.40`, calibré sur le jeu de test : `0,50` refusait deux reformulations couvertes (scores 0,411 et 0,499).
 - Dépendance à **scikit-learn** (`sklearn`) pour le TF-IDF ; l'ancrage n'existe pas dans le GGUF / llama.cpp.
 
