@@ -63,7 +63,7 @@ Tous les scripts Python fonctionnent **sans llama.cpp ni Ollama** : ils utilisen
 | Benchmark figé (jeu test) | Iris : 29/30 exactes, 30/30 ancrées, 30/30 retrieval, 5/5 hors base éloignées, 2/5 hors base proches (`reports/iris-test.json`) |
 | Référence Daisy (jeu test) | 28/30 exactes, 30/30 retrieval, 5/5 hors base éloignées, 1/5 hors base proches (`reports/daisy-test.json`) |
 | Poids locaux | `PicoGPT1-Iris/model.safetensors` (**non versionné**) |
-| Modèle publié | Daisy : <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>. Iris : dépôt prévu, non publié pour l'instant. |
+| Modèle publié | Iris : <https://huggingface.co/nazimboudeffa/PicoGPT1-Iris>. Daisy reste disponible : <https://huggingface.co/nazimboudeffa/PicoGPT1-Daisy>. |
 | Compatibilité llama.app | Confirmée via `llama cli -hf ...` |
 | Versions utilisées | Python 3.13 / Windows 11, `transformers` 4.52.4, `huggingface_hub` 0.33.0, `torch` CPU |
 
